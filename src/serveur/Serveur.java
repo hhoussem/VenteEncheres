@@ -20,9 +20,6 @@ public class Serveur extends UnicastRemoteObject implements IServeur{
 		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	@Override
