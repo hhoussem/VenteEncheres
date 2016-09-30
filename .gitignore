@@ -17,9 +17,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-/bin/serveur/*
-/bin/client/*
-/bin/commun/*
+#/bin/serveur/*
+#/bin/client/*
+#/bin/commun/*
 # =========================
 # Operating System Files
 # =========================
