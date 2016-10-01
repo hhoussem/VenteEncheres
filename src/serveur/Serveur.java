@@ -9,12 +9,14 @@ import java.util.Scanner;
 import client.Client;
 import commun.Produit;
 
-public class Serveur extends UnicastRemoteObject implements IServeur{
-	
+public class Serveur extends UnicastRemoteObject implements IServeur {
+
 	private List<Client> clients = new ArrayList<Client>();
+	private List<Client> listeEnchere = new ArrayList<Client>();
 	private List<Client> listeTemporaire = new ArrayList<Client>();
+	private Produit produit;
 	private final int NOMBRE_MAX_CLIENT = 3;
-	
+
 	protected Serveur() throws RemoteException {
 		super();
 		// TODO Auto-generated constructor stub
@@ -23,23 +25,39 @@ public class Serveur extends UnicastRemoteObject implements IServeur{
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public boolean validerInscription() throws RemoteException {
-		return true;
+	public Produit validerInscription(Client client) throws RemoteException {
+		try {
+			Client c = new Client(client.getId(), client.getNom(), client.getPrenom());
+			System.out.println("Demande du client => " + c.getId());
+			if (listeEnchere.size() < 4) {
+				listeEnchere.add(c);
+			}
+			for (int i = listeTemporaire.size() - 1; i >= 0; i--) {
+				if (listeTemporaire.get(i).getId() == client.getId()) {
+					listeTemporaire.remove(i);
+				}
+			}
+			return produit;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	@Override
-	public boolean demanderInscription(Client client) throws RemoteException {
-		Client c = new Client(client.getId(), client.getNom(), client.getPrenom());
-		System.out.println("Demande du client => "+c.getId());		
-		listeTemporaire.add(c);
-		System.out.println("Nombre d'inscrits => "+listeTemporaire.size());
-		Scanner s = new Scanner(System.in);
-		String a = s.nextLine();
+	public Produit demanderInscription(Client client) throws RemoteException {
+		try {
+			Client c = new Client(client.getId(), client.getNom(), client.getPrenom());
+			System.out.println("Demande du client => "+c.getId());		
+			listeTemporaire.add(c);
 
-		if(listeTemporaire.size() == NOMBRE_MAX_CLIENT){
-			
+			return produit;
+		} catch(Exception e) {
+			System.out.println(e.getMessage());
+			return null;
 		}
-		return true;
+			
+
+
 	}
 
 	@Override
@@ -49,8 +67,13 @@ public class Serveur extends UnicastRemoteObject implements IServeur{
 	}
 
 	@Override
-	public boolean lancerLavente(Produit produit) throws RemoteException {
-		// TODO Auto-generated method stub
+	public boolean lancerLavente(Produit produit, int nb_inscrit) throws RemoteException {
+
+		while (nb_inscrit == 4) {
+
+		}
+		// produit = new Produit(produit.getId(), produit.getNom(),
+		// produit.getPrenom());
 		return false;
 	}
 

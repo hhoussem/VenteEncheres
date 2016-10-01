@@ -9,6 +9,7 @@ import java.rmi.RemoteException;
 
 import serveur.IServeur;
 import serveur.Serveur;
+import commun.*;
 
 public class Client  implements IClient,Serializable {
 	
@@ -54,9 +55,14 @@ public class Client  implements IClient,Serializable {
 	    	Remote r = Naming.lookup("//127.0.0.1:8000/vente");
 	    	Client client = new Client("55","TOTO","titi");
 	      
-	      System.out.println(r.getClass());
-	        boolean s = ((IServeur) r).demanderInscription(client);
-	        System.out.println("chaine renvoyee = " + s);
+
+	        Produit produit = ((IServeur) r).demanderInscription(client);
+
+	        if (produit != null) {
+	        	System.out.println("client : " + client.getNom() + " enregistré!");
+	        } else {
+	        	System.out.println("fail!");
+	        }
 	    } catch (MalformedURLException e) {
 	      e.printStackTrace();
 	    } catch (RemoteException e) {
