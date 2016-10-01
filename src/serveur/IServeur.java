@@ -26,7 +26,7 @@ public interface IServeur extends Remote {
 	 * @return
 	 * @throws RemoteException
 	 */
-	public boolean encherir(Client client, Produit produit, double prix) throws RemoteException;
+	public boolean encherir(String idClient, Produit produit, double prix) throws RemoteException;
 
 	public boolean lancerLavente(Produit produit, int nb_inscrit) throws RemoteException;
 

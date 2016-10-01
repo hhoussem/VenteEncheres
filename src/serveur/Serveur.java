@@ -1,5 +1,9 @@
 package serveur;
 
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -10,8 +14,8 @@ import commun.Produit;
 
 public class Serveur extends UnicastRemoteObject implements IServeur {
 
-	private List<Client> clients = new ArrayList<Client>();
 	private List<Client> listeEnchere = new ArrayList<Client>();
+
 	private List<Client> listeTemporaire = new ArrayList<Client>();
 	private Produit produitEnVente;
 	private final int NOMBRE_MAX_CLIENT = 3;
@@ -52,11 +56,11 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	}
 
 	@Override
-	public Produit demanderInscription(Client client) throws RemoteException {
+	synchronized public Produit demanderInscription(Client client) throws RemoteException {
 		try {
 			Client c = new  Client(client.getId(), client.getNom(), client.getPrenom());
 			System.out.println("Demande d'inscri du client => " + c.getPrenom()+" "+c.getNom());
-			listeTemporaire.add(c);
+			listeEnchere.add(c);
 			System.out.println("client enregistré à la vente de " + produitEnVente.toString());
 			return produitEnVente;
 		} catch (Exception e) {
@@ -64,17 +68,37 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 			return null;
 		}
 	}
-
-	@Override
-	public boolean encherir(Client client, Produit produit, double prix) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+	public void updateBidders(double prix, Client winner){
+		for (Client client : listeEnchere) {
+			client.updatePrice(prix, winner);
+		}
 	}
 
+	@Override	
+	synchronized public boolean encherir(String idClient, Produit produit, double prix) throws RemoteException {
+
+		try {
+			Remote r = Naming.lookup("//127.0.0.1:9000/client");
+	        Client client = (Client) r;
+	        System.out.println(prix);
+	        
+	        if (prix > produitEnVente.getPrix()) {
+	        	produitEnVente.setPrix(prix);
+	        	produitEnVente.setWinner(client);
+	        }
+			
+			updateBidders(prix, client);
+		} catch (MalformedURLException | NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return false;
+	}
 	@Override
 	public boolean lancerLavente(Produit produit, int nb_inscrit) throws RemoteException {
 
-		while (nb_inscrit == 4) {
+		if (nb_inscrit == NOMBRE_MAX_CLIENT) {
 
 		}
 		return false;
