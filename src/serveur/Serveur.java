@@ -54,7 +54,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	@Override
 	public Produit demanderInscription(Client client) throws RemoteException {
 		try {
-			Client c = new Client(client.getId(), client.getNom(), client.getPrenom());
+			Client c = new  Client(client.getId(), client.getNom(), client.getPrenom());
 			System.out.println("Demande d'inscri du client => " + c.getPrenom()+" "+c.getNom());
 			listeTemporaire.add(c);
 			System.out.println("client enregistré à la vente de " + produitEnVente.toString());
