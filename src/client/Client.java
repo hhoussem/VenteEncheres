@@ -44,7 +44,6 @@ public class Client implements IClient, Serializable {
 
 	@Override
 	public boolean demanderInscription() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 }
