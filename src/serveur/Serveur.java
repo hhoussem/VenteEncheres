@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import client.Client;
 import commun.Produit;
@@ -14,22 +13,31 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	private List<Client> clients = new ArrayList<Client>();
 	private List<Client> listeEnchere = new ArrayList<Client>();
 	private List<Client> listeTemporaire = new ArrayList<Client>();
-	private Produit produit;
+	private Produit produitEnVente;
 	private final int NOMBRE_MAX_CLIENT = 3;
+
+	private static final long serialVersionUID = 1L;
 
 	protected Serveur() throws RemoteException {
 		super();
-		// TODO Auto-generated constructor stub
+		produitEnVente = new Produit("Telephone", 500, "ecran 5 pouces, 16go");
 	}
 
-	private static final long serialVersionUID = 1L;
+	public Produit getProduitEnVente() {
+		return produitEnVente;
+	}
+
+	public void setProduitEnVente(Produit produit) {
+		this.produitEnVente = produit;
+		System.out.println("Produit en vente: " + produit.toString());
+	}
 
 	@Override
 	public Produit validerInscription(Client client) throws RemoteException {
 		try {
 			Client c = new Client(client.getId(), client.getNom(), client.getPrenom());
 			System.out.println("Demande du client => " + c.getId());
-			if (listeEnchere.size() < 4) {
+			if (listeEnchere.size() < NOMBRE_MAX_CLIENT - 1) {
 				listeEnchere.add(c);
 			}
 			for (int i = listeTemporaire.size() - 1; i >= 0; i--) {
@@ -37,7 +45,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 					listeTemporaire.remove(i);
 				}
 			}
-			return produit;
+			return produitEnVente;
 		} catch (Exception e) {
 			return null;
 		}
@@ -47,17 +55,14 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	public Produit demanderInscription(Client client) throws RemoteException {
 		try {
 			Client c = new Client(client.getId(), client.getNom(), client.getPrenom());
-			System.out.println("Demande du client => "+c.getId());		
+			System.out.println("Demande du client => " + c.getId());
 			listeTemporaire.add(c);
-
-			return produit;
-		} catch(Exception e) {
+			System.out.println("returned produit " + produitEnVente.toString());
+			return produitEnVente;
+		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			return null;
 		}
-			
-
-
 	}
 
 	@Override
@@ -72,8 +77,6 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 		while (nb_inscrit == 4) {
 
 		}
-		// produit = new Produit(produit.getId(), produit.getNom(),
-		// produit.getPrenom());
 		return false;
 	}
 
