@@ -8,7 +8,7 @@ public class Produit implements Serializable {
 	private double prix;
 	private String description;
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1485L;
 
 	public Produit(String nom, double prix, String description) {
 		super();

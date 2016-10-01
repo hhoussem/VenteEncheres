@@ -36,7 +36,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	public Produit validerInscription(Client client) throws RemoteException {
 		try {
 			Client c = new Client(client.getId(), client.getNom(), client.getPrenom());
-			System.out.println("Demande du client => " + c.getId());
+			System.out.println("Valider l'inscri du client => " + c.getPrenom()+" "+c.getNom());
 			if (listeEnchere.size() < NOMBRE_MAX_CLIENT - 1) {
 				listeEnchere.add(c);
 			}
@@ -55,9 +55,9 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	public Produit demanderInscription(Client client) throws RemoteException {
 		try {
 			Client c = new Client(client.getId(), client.getNom(), client.getPrenom());
-			System.out.println("Demande du client => " + c.getId());
+			System.out.println("Demande d'inscri du client => " + c.getPrenom()+" "+c.getNom());
 			listeTemporaire.add(c);
-			System.out.println("returned produit " + produitEnVente.toString());
+			System.out.println("client enregistré à la vente de " + produitEnVente.toString());
 			return produitEnVente;
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

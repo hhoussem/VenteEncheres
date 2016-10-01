@@ -5,18 +5,17 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
+import commun.Parametres;
+
 public class LanceServeur {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try {
-			LocateRegistry.createRegistry(8000);
-
+			LocateRegistry.createRegistry(Parametres.PORT);
 			IServeur serveur = new Serveur();
-
-			String url = "//localhost:8000/vente";
-			System.out.println("Enregistrement du serveur sur l'url : " + url);
-			Naming.bind(url, serveur);
+			System.out.println("Enregistrement du serveur sur l'url : " + Parametres.URL);
+			Naming.bind(Parametres.URL, serveur);
 			System.out.println("Serveur lancé");
 		} catch (RemoteException e) {
 			e.printStackTrace();
