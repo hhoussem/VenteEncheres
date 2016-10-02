@@ -5,6 +5,11 @@ ehthumbs.db
 # Folder config file
 Desktop.ini
 
+#Eclipse conf
+.classpath
+/.settings/org.eclipse.jdt.core.prefs
+
+
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
@@ -16,7 +21,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
+/bin
 /bin/serveur/*
 /bin/client/*
 /bin/commun/*
