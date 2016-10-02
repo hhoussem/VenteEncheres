@@ -10,84 +10,58 @@ import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.server.UnicastRemoteObject;
 
 import commun.Produit;
 import serveur.IServeur;
 
 
-public class Client implements IClient, Serializable {
+public class Client extends UnicastRemoteObject implements IClient, Serializable {
 
-	private String id;
-	private String nom;
-	private String prenom;
-	private String etat; 
+	private Acheteur acheteur;
 	private Produit prod;
 	private static final long serialVersionUID = 1L;
 
-	public Client(String id, String nom, String prenom) {
-
-		this.id = id;
-		this.nom = nom;
-		this.prenom = prenom;
+	static InterfaceClient window;
+	
+	protected Client() throws RemoteException {
+		super();
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getNom() {
-		return nom;
-	}
-
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-
-	public String getPrenom() {
-		return prenom;
-	}
-
-	public void setPrenom(String prenom) {
-		this.prenom = prenom;
-	}
-
-	public String getEtat() {
-		return etat;
-	}
-
-	public void setEtat(String etat) {
-		this.etat = etat;
-	}
 	@Override
 	public boolean demanderInscription() {
 		return false;
 	}
 
-	public void updatePrice(double prix, Client winner)
+	@Override
+	public void updatePrice(double prix, Acheteur winner) throws RemoteException
 	{
+		if(prod==null) prod  = new Produit("prod", prix, "Desc");
 		prod.setPrix(prix);
 		prod.setWinner(winner);
+		System.out.println("Côté client: Nouveau prix ==> "+prix);
+		window.getCurrrentPriceLabel().setText("Nouveau prix ==> "+prix);
 	}
+	
 	public static void main(String[] args) {
-		InterfaceClient window = new  InterfaceClient();
+		window = new  InterfaceClient();
 		System.out.println("Lancement du client");
 		try {
-			LocateRegistry.createRegistry(9000);
+			int port = 9081;
+			LocateRegistry.createRegistry(port);
 
-			Client client = new Client("test", "test", "hfxndjh");
-
-
-			String url ="//localhost:9000/client";
+			Acheteur acheteur = new Acheteur("client"+port, "test", "hfxndjh");
+			IClient client  = new Client();
+			
+			//Il faut generer des ports differents pour chaque client et ainsi avoir des urls differents 
+			String url ="//localhost:"+port+"/client";
+			acheteur.setUrl(url);
 			System.out.println("Enregistrement de l'objet avec l'url : " + url);
 			Naming.bind(url, client);
 
 			Remote r = Naming.lookup("//127.0.0.1:8000/vente");
 
-			
+			window.setTitle("Client"+port);
 			window.add(window.buildContentPane());
 			window.setVisible(true);
 
@@ -119,9 +93,9 @@ public class Client implements IClient, Serializable {
 			
 			window.encherir.addActionListener(new CustomActionListener(window, r));
 
-			Produit produit = ((IServeur) r).demanderInscription(client);
+			Produit produit = ((IServeur) r).demanderInscription(acheteur);
 			if (produit != null) {
-				System.out.println("client : " + client.getNom() + " enregistré!");
+				System.out.println("client : " + acheteur.getNom() + " enregistrï¿½!");
 
 				window.signIn.setVisible(false);
 				window.encherir.setVisible(true);
@@ -145,5 +119,13 @@ public class Client implements IClient, Serializable {
 			e.printStackTrace();
 		}
 		System.out.println("Fin du client");
+	}
+
+	public Acheteur getAcheteur() {
+		return acheteur;
+	}
+
+	public void setAcheteur(Acheteur acheteur) {
+		this.acheteur = acheteur;
 	}
 }

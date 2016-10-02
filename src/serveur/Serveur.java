@@ -7,16 +7,19 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import client.Client;
+import client.Acheteur;
+import client.IClient;
 import commun.Produit;
 
 public class Serveur extends UnicastRemoteObject implements IServeur {
 
-	private List<Client> listeEnchere = new ArrayList<Client>();
+	private Map<String, Acheteur> listeEnchere = new HashMap<String, Acheteur>();
 
-	private List<Client> listeTemporaire = new ArrayList<Client>();
+	private List<Acheteur> listeTemporaire = new ArrayList<Acheteur>();
 	private Produit produitEnVente;
 	private final int NOMBRE_MAX_CLIENT = 3;
 
@@ -37,15 +40,15 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	}
 
 	@Override
-	public Produit validerInscription(Client client) throws RemoteException {
+	public Produit validerInscription(Acheteur acheteur) throws RemoteException {
 		try {
-			Client c = new Client(client.getId(), client.getNom(), client.getPrenom());
-			System.out.println("Valider l'inscri du client => " + c.getPrenom()+" "+c.getNom());
+			Acheteur c = new Acheteur(acheteur.getId(), acheteur.getNom(), acheteur.getPrenom());
+			System.out.println("Valider l'inscri du acheteur => " + c.getPrenom()+" "+c.getNom());
 			if (listeEnchere.size() < NOMBRE_MAX_CLIENT - 1) {
-				listeEnchere.add(c);
+				listeEnchere.put(c.getId(), c);
 			}
 			for (int i = listeTemporaire.size() - 1; i >= 0; i--) {
-				if (listeTemporaire.get(i).getId() == client.getId()) {
+				if (listeTemporaire.get(i).getId() == acheteur.getId()) {
 					listeTemporaire.remove(i);
 				}
 			}
@@ -56,45 +59,52 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	}
 
 	@Override
-	synchronized public Produit demanderInscription(Client client) throws RemoteException {
+	synchronized public Produit demanderInscription(Acheteur acheteur) throws RemoteException {
 		try {
-			Client c = new  Client(client.getId(), client.getNom(), client.getPrenom());
-			System.out.println("Demande d'inscri du client => " + c.getPrenom()+" "+c.getNom());
-			listeEnchere.add(c);
-			System.out.println("client enregistré à la vente de " + produitEnVente.toString());
+			Acheteur c = new  Acheteur(acheteur.getId(), acheteur.getNom(), acheteur.getPrenom());
+			c.setUrl(acheteur.getUrl());
+			System.out.println("Demande d'inscri du acheteur => " + c.getPrenom()+" "+c.getNom());
+			listeEnchere.put(c.getId(), c);
+			System.out.println("acheteur enregistré à la vente de " + produitEnVente.toString());
 			return produitEnVente;
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			return null;
 		}
 	}
-	public void updateBidders(double prix, Client winner){
-		for (Client client : listeEnchere) {
-			client.updatePrice(prix, winner);
-		}
+	public void updateBidders(double prix, Acheteur winner){
+		IClient client;
+		for (Acheteur acheteur : listeEnchere.values()) {
+			try{
+				client = connecterAuClient(acheteur);
+				client.updatePrice(prix, winner);
+			}catch (MalformedURLException | NotBoundException | RemoteException e) {
+				System.out.println("Impossible de joindre l'acheteur: "+acheteur.getNom()+" :"+e.getMessage());
+			}
+		}		
+	}
+	
+	private IClient connecterAuClient(Acheteur acheteur) throws MalformedURLException, RemoteException, NotBoundException{
+			//Remote r = Naming.lookup("//localhost:9000/client");
+			Remote r = Naming.lookup(acheteur.getUrl());
+			return (IClient) r;
 	}
 
 	@Override	
-	synchronized public boolean encherir(String idClient, Produit produit, double prix) throws RemoteException {
-
-		try {
-			Remote r = Naming.lookup("//127.0.0.1:9000/client");
-	        Client client = (Client) r;
-	        System.out.println(prix);
-	        
-	        if (prix > produitEnVente.getPrix()) {
-	        	produitEnVente.setPrix(prix);
-	        	produitEnVente.setWinner(client);
-	        }
-			
-			updateBidders(prix, client);
-		} catch (MalformedURLException | NotBoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+	synchronized public boolean encherir(String idAcheteur, Produit produit, double prix) throws RemoteException {
+			Acheteur acheteur = listeEnchere.get(idAcheteur);
+			if(acheteur!=null){
+		        if (prix > produitEnVente.getPrix()) {
+		        	produitEnVente.setPrix(prix);
+		        	produitEnVente.setWinner(acheteur);
+		        }
+			}else{
+				System.out.println("L'acheteur n'est pas encore inscrit!");
+			}
+			updateBidders(prix, acheteur);
 		return false;
 	}
+	
 	@Override
 	public boolean lancerLavente(Produit produit, int nb_inscrit) throws RemoteException {
 

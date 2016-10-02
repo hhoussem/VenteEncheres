@@ -22,12 +22,12 @@ import serveur.IServeur;
 
 public class FenetreClient extends JFrame implements ActionListener {
 
-	private Client client = null;
+	private Acheteur acheteur = null;
 	private IServeur serveur = null;
 
 	public FenetreClient() {
 		initComponents();
-		System.out.println("Lancement du client");
+		System.out.println("Lancement du acheteur");
 		try {
 			Remote remote = Naming.lookup(Parametres.URL);
 			serveur = (IServeur) remote;
@@ -38,20 +38,20 @@ public class FenetreClient extends JFrame implements ActionListener {
 
 	}
 
-	private void enregistrerClient(Client client) {
+	private void enregistrerAcheteur(Acheteur acheteur) {
 
 		Produit produit = null;
 		try {
-			produit = serveur.demanderInscription(client);
+			produit = serveur.demanderInscription(acheteur);
 		} catch (RemoteException e) {
 
 			e.printStackTrace();
 		}
 
 		if (produit != null) {
-			System.out.println("client : " + client.getNom() + " enregistré avec succés");
+			System.out.println("acheteur : " + acheteur.getNom() + " enregistré avec succés");
 		} else {
-			System.out.println("enregistrement du client échoué!");
+			System.out.println("enregistrement du acheteur échoué!");
 		}
 
 	}
@@ -70,18 +70,18 @@ public class FenetreClient extends JFrame implements ActionListener {
 				JOptionPane.showMessageDialog(null, "vous devez remplir tous les champs!");
 			} else {
 
-				enregistrerClient(new Client(textID.getText(), textNom.getText(), textPrenom.getText()));
+				enregistrerAcheteur(new Acheteur(textID.getText(), textNom.getText(), textPrenom.getText()));
 			}
 		}
 		if (e.getSource().equals(buttonAnnuler)) {
-			System.out.println("Fin du client");
+			System.out.println("Fin du acheteur");
 			this.dispose();
 		}
 	}
 
 	private void initComponents() {
 
-		this.setTitle("Nouveau client");
+		this.setTitle("Nouveau acheteur");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(400, 400);
 		Container container = this.getContentPane();
@@ -110,12 +110,12 @@ public class FenetreClient extends JFrame implements ActionListener {
 
 	}
 
-	public Client getClient() {
-		return client;
+	public Acheteur getAcheteur() {
+		return acheteur;
 	}
 
-	public void setClient(Client client) {
-		this.client = client;
+	public void setAcheteur(Acheteur acheteur) {
+		this.acheteur = acheteur;
 	}
 
 	public IServeur getServeur() {

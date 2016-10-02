@@ -14,6 +14,7 @@ public class InterfaceClient extends JFrame{
 	JButton encherir;
 	JTextField  price;
 	
+	JLabel prixEnchere;
 	/**
 	 * 
 	 */
@@ -28,6 +29,8 @@ public class InterfaceClient extends JFrame{
 		encherir = new JButton("Enchérir");
 		
 		price = new JTextField ("", 10);
+		
+		prixEnchere = new JLabel("Prix Enchere actuel est: 0!");
 		
 		 this.setSize(400, 100);
 		 
@@ -45,12 +48,17 @@ public class InterfaceClient extends JFrame{
 		panel.add(encherir);
 		panel.add(price);
 		
+		panel.add(prixEnchere);
+		
 		price.setVisible(false);
 		encherir.setVisible(false);
  
 		return panel;
 	}
 
+	public JLabel getCurrrentPriceLabel(){
+		return prixEnchere;
+	}
 	
 	
 	

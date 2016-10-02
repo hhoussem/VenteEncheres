@@ -2,7 +2,8 @@ package commun;
 
 import java.io.Serializable;
 
-import client.Client;
+import client.Acheteur;
+import client.Acheteur;
 
 public class Produit implements Serializable {
 
@@ -10,7 +11,7 @@ public class Produit implements Serializable {
 	private String nom;
 	private double prix;
 	private String description;
-	private Client winner;
+	private Acheteur winner;
 
 	private static final long serialVersionUID = 1485L;
 
@@ -51,12 +52,12 @@ public class Produit implements Serializable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public Client getWinner() {
+	public Acheteur getWinner() {
 		return winner;
 	}
 
 
-	public void setWinner(Client winner) {
+	public void setWinner(Acheteur winner) {
 		this.winner = winner;
 	}
 	public String toString() {

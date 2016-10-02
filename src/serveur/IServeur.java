@@ -2,8 +2,7 @@ package serveur;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-
-import client.Client;
+import client.Acheteur;
 import commun.Produit;
 
 public interface IServeur extends Remote {
@@ -13,9 +12,9 @@ public interface IServeur extends Remote {
 	 * @return
 	 * @throws RemoteException
 	 */
-	public Produit validerInscription(Client client) throws RemoteException;
+	public Produit validerInscription(Acheteur client) throws RemoteException;
 
-	public Produit demanderInscription(Client client) throws RemoteException;
+	public Produit demanderInscription(Acheteur client) throws RemoteException;
 
 	/**
 	 * Mettre a jour le prix dans encherir
