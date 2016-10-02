@@ -19,6 +19,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	private List<Client> listeTemporaire = new ArrayList<Client>();
 	private Produit produitEnVente;
 	private final int NOMBRE_MAX_CLIENT = 3;
+		private Produit produitEnVente1;
 
 	private static final long serialVersionUID = 1L;
 
