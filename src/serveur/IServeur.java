@@ -12,9 +12,9 @@ public interface IServeur extends Remote {
 	 * @return
 	 * @throws RemoteException
 	 */
-	public Produit validerInscription(Acheteur client) throws RemoteException;
+	public Produit validerInscription(Acheteur acheteur) throws RemoteException;
 
-	public Produit demanderInscription(Acheteur client) throws RemoteException;
+	public Produit demanderInscription(Acheteur acheteur) throws RemoteException;
 
 	/**
 	 * Mettre a jour le prix dans encherir
@@ -25,7 +25,7 @@ public interface IServeur extends Remote {
 	 * @return
 	 * @throws RemoteException
 	 */
-	public boolean encherir(String idClient, Produit produit, double prix) throws RemoteException;
+	public boolean encherir(String idAcheteur, Produit produit, double prix) throws RemoteException;
 
 	public boolean lancerLavente(Produit produit, int nb_inscrit) throws RemoteException;
 

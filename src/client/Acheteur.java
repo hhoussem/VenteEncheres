@@ -3,18 +3,17 @@ package client;
 import java.io.Serializable;
 import commun.Produit;
 
-
 public class Acheteur implements IClient, Serializable {
 
 	private String id;
 	private String nom;
 	private String prenom;
-	private String etat; 
-	private Produit prod;
-	
+	private String etat;
+	private Produit produitEnVente;
+
 	private String url;
 	private int port;
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public Acheteur(String id, String nom, String prenom) {
@@ -55,15 +54,15 @@ public class Acheteur implements IClient, Serializable {
 	public void setEtat(String etat) {
 		this.etat = etat;
 	}
+
 	@Override
 	public boolean demanderInscription() {
 		return false;
 	}
 
-	public void updatePrice(double prix, Acheteur winner)
-	{
-		prod.setPrix(prix);
-		prod.setWinner(winner);
+	public void updatePrice(double prix, Acheteur winner) {
+		produitEnVente.setPrix(prix);
+		produitEnVente.setWinner(winner);
 	}
 
 	public String getUrl() {
@@ -82,4 +81,7 @@ public class Acheteur implements IClient, Serializable {
 		this.port = port;
 	}
 
+	public String toString() {
+		return (id + " " + prenom + " " + nom);
+	}
 }

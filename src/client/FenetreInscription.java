@@ -20,19 +20,18 @@ import commun.Parametres;
 import commun.Produit;
 import serveur.IServeur;
 
-public class FenetreClient extends JFrame implements ActionListener {
+public class FenetreInscription extends JFrame implements ActionListener {
 
 	private Acheteur acheteur = null;
 	private IServeur serveur = null;
 
-	public FenetreClient() {
+	public FenetreInscription() {
 		initComponents();
 		System.out.println("Lancement du acheteur");
 		try {
-			Remote remote = Naming.lookup(Parametres.URL);
+			Remote remote = Naming.lookup(Parametres.URL_SERVEUR);
 			serveur = (IServeur) remote;
 		} catch (MalformedURLException | RemoteException | NotBoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -58,7 +57,7 @@ public class FenetreClient extends JFrame implements ActionListener {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		FenetreClient m_fenetre = new FenetreClient();
+		FenetreInscription m_fenetre = new FenetreInscription();
 
 	}
 

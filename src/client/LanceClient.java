@@ -1,7 +1,5 @@
 package client;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.nio.channels.AlreadyBoundException;
@@ -12,19 +10,21 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 
+import commun.Parametres;
 import commun.Produit;
 import serveur.IServeur;
 
 
-public class Client extends UnicastRemoteObject implements IClient, Serializable {
+public class LanceClient extends UnicastRemoteObject implements IClient, Serializable {
 
 	private Acheteur acheteur;
-	private Produit prod;
+	private Produit produitEnVente;
 	private static final long serialVersionUID = 1L;
 
-	static InterfaceClient window;
+	static FenetreInscription fenetreInsciption;
+	static FenetreEnchere fenetreEnchere;
 	
-	protected Client() throws RemoteException {
+	protected LanceClient() throws RemoteException {
 		super();
 	}
 
@@ -36,22 +36,25 @@ public class Client extends UnicastRemoteObject implements IClient, Serializable
 	@Override
 	public void updatePrice(double prix, Acheteur winner) throws RemoteException
 	{
-		if(prod==null) prod  = new Produit("prod", prix, "Desc");
-		prod.setPrix(prix);
-		prod.setWinner(winner);
+		if(produitEnVente==null){
+			produitEnVente  = new Produit("prod", prix, "Desc");
+		}
+		produitEnVente.setPrix(prix);
+		produitEnVente.setWinner(winner);
 		System.out.println("Côté client: Nouveau prix ==> "+prix);
-		window.getCurrrentPriceLabel().setText("Nouveau prix ==> "+prix);
+		fenetreEnchere.getCurrrentPriceLabel().setText("Nouveau prix ==> "+prix);
 	}
 	
 	public static void main(String[] args) {
-		window = new  InterfaceClient();
+		fenetreEnchere = new  FenetreEnchere();
 		System.out.println("Lancement du client");
 		try {
-			int port = 9081;
+			int port = 9082;
 			LocateRegistry.createRegistry(port);
 
 			Acheteur acheteur = new Acheteur("client"+port, "test", "hfxndjh");
-			IClient client  = new Client();
+			IClient client  = new LanceClient();
+			
 			
 			//Il faut generer des ports differents pour chaque client et ainsi avoir des urls differents 
 			String url ="//localhost:"+port+"/client";
@@ -59,47 +62,18 @@ public class Client extends UnicastRemoteObject implements IClient, Serializable
 			System.out.println("Enregistrement de l'objet avec l'url : " + url);
 			Naming.bind(url, client);
 
-			Remote r = Naming.lookup("//127.0.0.1:8000/vente");
+			Remote r = Naming.lookup(Parametres.URL_SERVEUR);
 
-			window.setTitle("Client"+port);
-			window.add(window.buildContentPane());
-			window.setVisible(true);
-
-
-			class CustomActionListener implements ActionListener
-			{
-				InterfaceClient window;
-				IServeur r;
-				public CustomActionListener(InterfaceClient window, Remote r)
-				{
-					this.window = window;
-					this.r = (IServeur)r;
-
-				}
-
-				public void actionPerformed(ActionEvent e) {
-					double prix = Double.parseDouble(window.price.getText());
-					Produit pro = new Produit ("produit", 123654, "hfxndjh");
-
-					try {
-						r.encherir("test", pro, prix);
-					} catch (RemoteException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}
-				
-			}
-			
-			window.encherir.addActionListener(new CustomActionListener(window, r));
+			fenetreEnchere.setTitle("Client"+port);
+			fenetreEnchere.add(fenetreEnchere.buildContentPane());
+			fenetreEnchere.setVisible(true);
+			fenetreEnchere.encherirBtn.addActionListener(new EncherirActionListener(fenetreEnchere, r));
 
 			Produit produit = ((IServeur) r).demanderInscription(acheteur);
 			if (produit != null) {
-				System.out.println("client : " + acheteur.getNom() + " enregistrï¿½!");
-
-				window.signIn.setVisible(false);
-				window.encherir.setVisible(true);
-				window.price.setVisible(true);
+				System.out.println("client : " + acheteur.getNom() + " enregistré");
+				fenetreEnchere.encherirBtn.setVisible(true);
+				fenetreEnchere.prixInput.setVisible(true);
 				
 
 			} else {
@@ -129,3 +103,4 @@ public class Client extends UnicastRemoteObject implements IClient, Serializable
 		this.acheteur = acheteur;
 	}
 }
+
