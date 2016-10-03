@@ -55,3 +55,8 @@ Temporary Items
 .apdisk
 *.class
 /bin/
+
+*.class
+bin/serveur/LanceServeur.class
+bin/serveur/LanceServeur.class
+*.class

@@ -2,80 +2,26 @@ package client;
 
 import java.awt.Container;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.Remote;
-import java.rmi.RemoteException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import commun.Parametres;
-import commun.Produit;
-import serveur.IServeur;
+public class FenetreInscription extends JFrame {
 
-public class FenetreInscription extends JFrame implements ActionListener {
+	JTextField textID;
+	JTextField textNom;
+	JTextField textPrenom;
+	JButton buttonEnregistrer;
+	JButton buttonAnnuler;
 
-	private Acheteur acheteur = null;
-	private IServeur serveur = null;
-
-	public FenetreInscription() {
+	public FenetreInscription(Remote r) {
 		initComponents();
-		System.out.println("Lancement du acheteur");
-		try {
-			Remote remote = Naming.lookup(Parametres.URL_SERVEUR);
-			serveur = (IServeur) remote;
-		} catch (MalformedURLException | RemoteException | NotBoundException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	private void enregistrerAcheteur(Acheteur acheteur) {
-
-		Produit produit = null;
-		try {
-			produit = serveur.demanderInscription(acheteur);
-		} catch (RemoteException e) {
-
-			e.printStackTrace();
-		}
-
-		if (produit != null) {
-			System.out.println("acheteur : " + acheteur.getNom() + " enregistré avec succés");
-		} else {
-			System.out.println("enregistrement du acheteur échoué!");
-		}
-
-	}
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		FenetreInscription m_fenetre = new FenetreInscription();
-
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource().equals(buttonEnregistrer)) {
-			if (this.textID.getText().equals("") || this.textPrenom.getText().equals("")
-					|| this.textNom.getText().equals("")) {
-				JOptionPane.showMessageDialog(null, "vous devez remplir tous les champs!");
-			} else {
-
-				enregistrerAcheteur(new Acheteur(textID.getText(), textNom.getText(), textPrenom.getText()));
-			}
-		}
-		if (e.getSource().equals(buttonAnnuler)) {
-			System.out.println("Fin du acheteur");
-			this.dispose();
-		}
+		this.buttonEnregistrer.addActionListener(new InscriptionActionListener(this,r));
+		this.buttonAnnuler.addActionListener(new InscriptionActionListener(this,r));
+		
 	}
 
 	private void initComponents() {
@@ -91,9 +37,7 @@ public class FenetreInscription extends JFrame implements ActionListener {
 		this.textPrenom = new JTextField();
 		// boutons
 		this.buttonEnregistrer = new JButton("Enregistrer");
-		this.buttonEnregistrer.addActionListener(this);
 		this.buttonAnnuler = new JButton("Annuler");
-		this.buttonAnnuler.addActionListener(this);
 		// ajout des éléments dans le conteneur
 		container.add(new JLabel("  ID"));
 		container.add(this.textID);
@@ -108,28 +52,5 @@ public class FenetreInscription extends JFrame implements ActionListener {
 		this.setVisible(true);
 
 	}
-
-	public Acheteur getAcheteur() {
-		return acheteur;
-	}
-
-	public void setAcheteur(Acheteur acheteur) {
-		this.acheteur = acheteur;
-	}
-
-	public IServeur getServeur() {
-		return serveur;
-	}
-
-	public void setServeur(IServeur serveur) {
-		this.serveur = serveur;
-	}
-
-	// composants graphiques
-	private JTextField textID;
-	private JTextField textNom;
-	private JTextField textPrenom;
-	private JButton buttonEnregistrer;
-	private JButton buttonAnnuler;
 
 }

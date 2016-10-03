@@ -1,6 +1,7 @@
 package client;
 
 import java.awt.FlowLayout;
+import java.rmi.Remote;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,13 +17,12 @@ public class FenetreEnchere extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	public FenetreEnchere() {
+	public FenetreEnchere(String title,Remote remote) {
 
-		encherirBtn = new JButton("Enchérir");
-		prixInput = new JTextField("", 10);
-		prixEnchere = new JLabel("Prix Enchere actuel est: 0!");
-		this.setSize(400, 100);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		initComponents();
+		encherirBtn.addActionListener(new EncherirActionListener(this, remote));
+		this.setTitle(title);
+	
 
 	}
 
@@ -41,5 +41,17 @@ public class FenetreEnchere extends JFrame {
 	public JLabel getCurrrentPriceLabel() {
 		return prixEnchere;
 	}
+	private void initComponents(){
 
+		encherirBtn = new JButton("Enchérir");
+		prixInput = new JTextField("", 10);
+		prixEnchere = new JLabel("Prix Enchere actuel est: 0!");
+		this.setSize(400, 100);
+		this.add(this.buildContentPane());
+		encherirBtn.setVisible(true);
+		prixInput.setVisible(true);
+		this.setVisible(true);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+	}
 }

@@ -18,7 +18,7 @@ class EncherirActionListener implements ActionListener {
 
 	}
 
-	public void actionPerformed(ActionEvent e) {
+	synchronized public void actionPerformed(ActionEvent e) {
 		double prix = 0;
 		try {
 			prix = Double.parseDouble(fenEnchere.prixInput.getText());

@@ -9,6 +9,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Random;
 
 import commun.Parametres;
 import commun.Produit;
@@ -46,35 +47,30 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 	}
 	
 	public static void main(String[] args) {
-		fenetreEnchere = new  FenetreEnchere();
+		
 		System.out.println("Lancement du client");
 		try {
-			int port = 9082;
+			Random rand = new Random();
+			int port =  rand.nextInt(60000-10000) + 10000;
 			LocateRegistry.createRegistry(port);
 
-			Acheteur acheteur = new Acheteur("client"+port, "test", "hfxndjh");
+			Acheteur acheteur = new Acheteur("client"+port, "testnom", "test1");
 			IClient client  = new LanceClient();
-			
 			
 			//Il faut generer des ports differents pour chaque client et ainsi avoir des urls differents 
 			String url ="//localhost:"+port+"/client";
 			acheteur.setUrl(url);
-			System.out.println("Enregistrement de l'objet avec l'url : " + url);
+			
+			System.out.println("Enregistrement de du client avec l'url : " + url);
 			Naming.bind(url, client);
 
-			Remote r = Naming.lookup(Parametres.URL_SERVEUR);
-
-			fenetreEnchere.setTitle("Client"+port);
-			fenetreEnchere.add(fenetreEnchere.buildContentPane());
-			fenetreEnchere.setVisible(true);
-			fenetreEnchere.encherirBtn.addActionListener(new EncherirActionListener(fenetreEnchere, r));
-
-			Produit produit = ((IServeur) r).demanderInscription(acheteur);
+			Remote remoteServer = Naming.lookup(Parametres.URL_SERVEUR);
+			//fenetreInsciption = new FenetreInscription(remoteServer);
+			fenetreEnchere = new  FenetreEnchere("Client"+port,remoteServer);
+			
+			Produit produit = ((IServeur) remoteServer).demanderInscription(acheteur);
 			if (produit != null) {
 				System.out.println("client : " + acheteur.getNom() + " enregistré");
-				fenetreEnchere.encherirBtn.setVisible(true);
-				fenetreEnchere.prixInput.setVisible(true);
-				
 
 			} else {
 				System.out.println("fail!");

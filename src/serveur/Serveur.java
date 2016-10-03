@@ -18,18 +18,17 @@ import commun.Produit;
 public class Serveur extends UnicastRemoteObject implements IServeur {
 
 	private Map<String, Acheteur> listeEnchere = new HashMap<String, Acheteur>();
-
 	private List<Acheteur> listeTemporaire = new ArrayList<Acheteur>();
-	private Produit produitEnVente;
+	private Produit produitEnVente=null;
 	private final int NOMBRE_MAX_CLIENT = 3;
 
 	private static final long serialVersionUID = 1L;
 
 	protected Serveur() throws RemoteException {
 		super();
-		produitEnVente = new Produit("Telephone", 500, "ecran 5 pouces, 16go");
 	}
-
+	
+	@Override
 	public Produit getProduitEnVente() {
 		return produitEnVente;
 	}
@@ -43,7 +42,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	public Produit validerInscription(Acheteur acheteur) throws RemoteException {
 		try {
 			Acheteur c = new Acheteur(acheteur.getId(), acheteur.getNom(), acheteur.getPrenom());
-			System.out.println("Valider l'inscri du acheteur => " + c.getPrenom()+" "+c.getNom());
+			System.out.println("Valider l'inscri du acheteur => " + c.getPrenom() + " " + c.getNom());
 			if (listeEnchere.size() < NOMBRE_MAX_CLIENT - 1) {
 				listeEnchere.put(c.getId(), c);
 			}
@@ -61,9 +60,9 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	@Override
 	synchronized public Produit demanderInscription(Acheteur acheteur) throws RemoteException {
 		try {
-			Acheteur c = new  Acheteur(acheteur.getId(), acheteur.getNom(), acheteur.getPrenom());
+			Acheteur c = new Acheteur(acheteur.getId(), acheteur.getNom(), acheteur.getPrenom());
 			c.setUrl(acheteur.getUrl());
-			System.out.println("Demande d'inscri du acheteur => " + c.getPrenom()+" "+c.getNom());
+			System.out.println("Demande d'inscri du acheteur => " + c.getPrenom() + " " + c.getNom());
 			listeEnchere.put(c.getId(), c);
 			System.out.println("acheteur enregistré à la vente de " + produitEnVente.toString());
 			return produitEnVente;
@@ -72,39 +71,40 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 			return null;
 		}
 	}
-	public void updateBidders(double prix, Acheteur winner){
+
+	public void updateBidders(double prix, Acheteur winner) {
 		IClient client;
 		for (Acheteur acheteur : listeEnchere.values()) {
-			try{
+			try {
 				client = connecterAuClient(acheteur);
 				client.updatePrice(prix, winner);
-			}catch (MalformedURLException | NotBoundException | RemoteException e) {
-				System.out.println("Impossible de joindre l'acheteur: "+acheteur.getNom()+" :"+e.getMessage());
+			} catch (MalformedURLException | NotBoundException | RemoteException e) {
+				System.out.println("Impossible de joindre l'acheteur: " + acheteur.getNom() + " :" + e.getMessage());
 			}
-		}		
-	}
-	
-	private IClient connecterAuClient(Acheteur acheteur) throws MalformedURLException, RemoteException, NotBoundException{
-			//Remote r = Naming.lookup("//localhost:9000/client");
-			Remote r = Naming.lookup(acheteur.getUrl());
-			return (IClient) r;
+		}
 	}
 
-	@Override	
+	private IClient connecterAuClient(Acheteur acheteur)
+			throws MalformedURLException, RemoteException, NotBoundException {
+		Remote r = Naming.lookup(acheteur.getUrl());
+		return (IClient) r;
+	}
+
+	@Override
 	synchronized public boolean encherir(String idAcheteur, Produit produit, double prix) throws RemoteException {
-			Acheteur acheteur = listeEnchere.get(idAcheteur);
-			if(acheteur!=null){
-		        if (prix > produitEnVente.getPrix()) {
-		        	produitEnVente.setPrix(prix);
-		        	produitEnVente.setWinner(acheteur);
-		        }
-			}else{
-				System.out.println("L'acheteur n'est pas encore inscrit!");
+		Acheteur acheteur = listeEnchere.get(idAcheteur);
+		if (acheteur != null) {
+			if (prix > produitEnVente.getPrix()) {
+				produitEnVente.setPrix(prix);
+				produitEnVente.setWinner(acheteur);
 			}
-			updateBidders(prix, acheteur);
+		} else {
+			System.out.println("L'acheteur n'est pas encore inscrit!");
+		}
+		updateBidders(prix, acheteur);
 		return false;
 	}
-	
+
 	@Override
 	public boolean lancerLavente(Produit produit, int nb_inscrit) throws RemoteException {
 
