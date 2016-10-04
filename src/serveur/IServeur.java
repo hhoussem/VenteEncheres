@@ -16,7 +16,7 @@ public interface IServeur extends Remote {
 
 	public Produit demanderInscription(Acheteur acheteur) throws RemoteException;
 
-	public Produit getProduitEnVente();
+	public Produit getProduitEnVente() throws RemoteException;
 	/**
 	 * Mettre a jour le prix dans encherir
 	 * 
