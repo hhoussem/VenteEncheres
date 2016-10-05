@@ -13,6 +13,7 @@ import java.util.Map;
 
 import client.Acheteur;
 import client.IClient;
+import commun.EtatAcheteur;
 import commun.Produit;
 
 public class Serveur extends UnicastRemoteObject implements IServeur {
@@ -89,20 +90,60 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 		Remote r = Naming.lookup(acheteur.getUrl());
 		return (IClient) r;
 	}
+	
+	private boolean verifierSiVenteTerminee(){
+		boolean terminee = true;
+		for (Acheteur acheteur : listeEnchere.values()) {
+			if(!acheteur.getEtat().equals(EtatAcheteur.TERMINE)){
+				terminee = false;
+				break;
+			}
+		}
+		return terminee;
+	}
 
+	private void notifierVenteTerminee(){
+		IClient client;
+		for (Acheteur acheteur : listeEnchere.values()) {
+				try {
+					client = connecterAuClient(acheteur);
+					client.venterTerminee(produitEnVente.getPrix(), produitEnVente.getWinner());
+				} catch (MalformedURLException | RemoteException | NotBoundException e) {
+					System.out.println("Impossible de joindre l'acheteur: " + acheteur.getNom() + " :" + e.getMessage());
+				}				
+		}
+	}
+	
+	@Override
+	synchronized public void tempsEcoule(String idAcheteur) throws RemoteException {
+		Acheteur acheteur = listeEnchere.get(idAcheteur);
+		if (acheteur != null) {
+			acheteur.setEtat(EtatAcheteur.TERMINE);
+			if(verifierSiVenteTerminee()){
+				notifierVenteTerminee();
+			}
+		} else {
+			System.out.println("L'acheteur n'est pas encore inscrit!");
+		}
+	}
 	@Override
 	synchronized public boolean encherir(String idAcheteur, Produit produit, double prix) throws RemoteException {
 		Acheteur acheteur = listeEnchere.get(idAcheteur);
 		if (acheteur != null) {
 			if (prix > produitEnVente.getPrix()) {
+				acheteur.setEtat(EtatAcheteur.ENCHERISSEMENT);
 				produitEnVente.setPrix(prix);
 				produitEnVente.setWinner(acheteur);
+				updateBidders(prix, acheteur);
+				if(verifierSiVenteTerminee()){
+					notifierVenteTerminee();
+				}
 			}
 		} else {
-			System.out.println("L'acheteur n'est pas encore inscrit!");
+			System.out.println("Encherir: L'acheteur n'est pas encore inscrit!");
+			return false;
 		}
-		updateBidders(prix, acheteur);
-		return false;
+		return true;
 	}
 
 	@Override

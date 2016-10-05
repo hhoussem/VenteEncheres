@@ -30,4 +30,6 @@ public interface IServeur extends Remote {
 
 	public boolean lancerLavente(Produit produit, int nb_inscrit) throws RemoteException;
 
+	void tempsEcoule(String idAcheteur) throws RemoteException;
+
 }

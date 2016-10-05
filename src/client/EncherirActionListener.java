@@ -27,10 +27,11 @@ class EncherirActionListener implements ActionListener {
 			ex.printStackTrace();
 		}
 		fenEnchere.prixInput.setText("");
-		Produit pro = new Produit("produit", 123654, "hfxndjh");
+		Produit pro = LanceClient.PRODUITENVENTE;
+		String idAcheteur = LanceClient.ACHETEUR.getId();
 
 		try {
-			remote.encherir("test", pro, prix);
+			remote.encherir(idAcheteur, pro, prix);
 		} catch (RemoteException e1) {
 			e1.printStackTrace();
 		}

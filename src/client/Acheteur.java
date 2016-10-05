@@ -1,18 +1,20 @@
 package client;
 
 import java.io.Serializable;
+
+import commun.EtatAcheteur;
 import commun.Produit;
 
-public class Acheteur implements IClient, Serializable {
+public class Acheteur implements Serializable {
 
 	private String id;
 	private String nom;
 	private String prenom;
-	private String etat;
 	private Produit produitEnVente;
 
 	private String url;
 	private int port;
+	private EtatAcheteur etat = EtatAcheteur.EN_ATTENTE;
 
 	private static final long serialVersionUID = 1L;
 
@@ -47,19 +49,6 @@ public class Acheteur implements IClient, Serializable {
 		this.prenom = prenom;
 	}
 
-	public String getEtat() {
-		return etat;
-	}
-
-	public void setEtat(String etat) {
-		this.etat = etat;
-	}
-
-	@Override
-	public boolean demanderInscription() {
-		return false;
-	}
-
 	public void updatePrice(double prix, Acheteur winner) {
 		produitEnVente.setPrix(prix);
 		produitEnVente.setWinner(winner);
@@ -84,4 +73,13 @@ public class Acheteur implements IClient, Serializable {
 	public String toString() {
 		return (id + " " + prenom + " " + nom);
 	}
+
+	public EtatAcheteur getEtat() {
+		return etat;
+	}
+
+	public void setEtat(EtatAcheteur etat) {
+		this.etat = etat;
+	}
+
 }

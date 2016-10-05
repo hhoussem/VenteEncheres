@@ -23,6 +23,7 @@ public class InscriptionActionListener implements ActionListener{
 		System.out.println("Lancement de l'acheteur");
 		Produit produit = null;
 		try {
+			LanceClient.ACHETEUR = acheteur;
 			produit = remoteServeur.demanderInscription(acheteur);
 		} catch (RemoteException e) {
 
