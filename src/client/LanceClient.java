@@ -10,18 +10,19 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
-
-import commun.Listenable;
 import commun.Parametres;
 import commun.Produit;
 import serveur.IServeur;
 
 
-public class LanceClient extends Listenable implements IClient, Serializable {
+public class LanceClient extends UnicastRemoteObject implements IClient, Serializable {
 
 	public static Acheteur ACHETEUR;
 	public static Produit PRODUITENVENTE;
 
+	 FenetreInscription fenetreInsciption;
+	 FenetreEnchere fenetreEnchere;
+	 
 	private static final long serialVersionUID = 1L;
 
 	
@@ -43,24 +44,31 @@ public class LanceClient extends Listenable implements IClient, Serializable {
 		PRODUITENVENTE.setPrix(prix);
 		PRODUITENVENTE.setWinner(winner);
 		System.out.println("Côté client: Nouveau prix ==> "+prix);
-		notifyUpdatePriceListeners();
+		fenetreEnchere.getPrixEnchere().setText("Gagnant: "+LanceClient.ACHETEUR.getId()+"  Prix:"+LanceClient.PRODUITENVENTE.getPrix());
+		//A determiner quand on re-initialise le chronometre
+		fenetreEnchere.setCountChrono(0);
 	}
-	
+
 	public static void main(String[] args) {
+		try {
+			LanceClient client  = new LanceClient();
+			client.executer();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void executer() {
 		
 		System.out.println("Lancement du client");
 		try {
-			
-			 FenetreInscription fenetreInsciption;
-			 FenetreEnchere fenetreEnchere;
-			
 			
 			Random rand = new Random();
 			int port =  rand.nextInt(60000-10000) + 10000;
 			LocateRegistry.createRegistry(port);
 
 			Acheteur acheteur = new Acheteur("client"+port, "testnom", "test1");
-			LanceClient client  = new LanceClient();
+			
 			
 			//Il faut generer des ports differents pour chaque client et ainsi avoir des urls differents 
 			String url ="//localhost:"+port+"/client";
@@ -68,13 +76,11 @@ public class LanceClient extends Listenable implements IClient, Serializable {
 			LanceClient.ACHETEUR = acheteur;
 			
 			System.out.println("Enregistrement de du client avec l'url : " + url);
-			Naming.bind(url, client);
+			Naming.bind(url, this);
 
 			Remote remoteServer = Naming.lookup(Parametres.URL_SERVEUR);
 			//fenetreInsciption = new FenetreInscription(remoteServer);
 			fenetreEnchere = new  FenetreEnchere("Client"+port,remoteServer);
-			client.addUpdatePriceListeners(fenetreEnchere);
-			client.addVenteTermineeListener(fenetreEnchere);
 			
 			Produit produit = ((IServeur) remoteServer).demanderInscription(acheteur);
 			if (produit != null) {
@@ -101,9 +107,9 @@ public class LanceClient extends Listenable implements IClient, Serializable {
 
 	@Override
 	public void venterTerminee(double prix, Acheteur winner) throws RemoteException {
-		String msg = "VENTE TERMINEE, PRIX="+prix+" GAGNANT: "+winner;
+		String msg = "VENTE TERMINEE, PRIX="+prix+" GAGNANT: "+winner.getNom();
 		System.out.println(msg);
-		notifyVenteTermineeListener(msg);
+		fenetreEnchere.getPrixEnchere().setText(msg);
 	}
 }
 

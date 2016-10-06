@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import commun.Chronometre;
-import commun.Command;
 import commun.EtatAcheteur;
 import commun.Parametres;
 import serveur.IServeur;
@@ -23,10 +22,30 @@ public class FenetreEnchere extends JFrame implements ActionListener{
 	JButton encherirBtn;
 	JTextField prixInput;
 	JLabel prixEnchere;
+	public JLabel getPrixEnchere() {
+		return prixEnchere;
+	}
+
+	public void setPrixEnchere(JLabel prixEnchere) {
+		this.prixEnchere = prixEnchere;
+	}
+
 	JLabel chronoAffichage;
 	
-	Chronometre chrono;
+	private Chronometre chrono;
+	public Chronometre getChrono() {
+		return chrono;
+	}
+
 	private int countChrono = 0;
+
+	public void setCountChrono(int countChrono) {
+		this.countChrono = countChrono;
+	}
+
+	public int getCountChrono() {
+		return countChrono;
+	}
 
 	private IServeur serveur;
 
@@ -86,12 +105,6 @@ public class FenetreEnchere extends JFrame implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
-		if(e.getID() == Command.VENTE_TERMINEE){
-			prixEnchere.setText(e.getActionCommand());	
-		}else if(e.getID() == Command.UPDATE_PRICE){
-			prixEnchere.setText("Gagnant: "+LanceClient.ACHETEUR.getId()+"  Prix:"+LanceClient.PRODUITENVENTE.getPrix());
-		}else{
 			countChrono++;
 			chronoAffichage.setText("Chronometre: 0"+countChrono);
 			if(countChrono==Parametres.TEMPS_ATTENTE_ENCHERE){
@@ -105,6 +118,5 @@ public class FenetreEnchere extends JFrame implements ActionListener{
 					System.out.println("Erreur lors de la notification du serveur!");
 				}
 			}
-		}
 	}
 }
