@@ -16,6 +16,9 @@ public class FenetreInscription extends JFrame {
 	JTextField textPrenom;
 	JButton buttonEnregistrer;
 	JButton buttonAnnuler;
+	JLabel messageSurLaVente;
+	Container container;
+	Container containerForm;
 
 	public FenetreInscription(Remote r) {
 		initComponents();
@@ -29,8 +32,10 @@ public class FenetreInscription extends JFrame {
 		this.setTitle("Nouveau acheteur");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(400, 400);
-		Container container = this.getContentPane();
+		container = this.getContentPane();
+		containerForm = new Container();
 		container.setLayout(new GridLayout(4, 2));
+		containerForm.setLayout(new GridLayout(4, 2));
 		// zone de texte
 		this.textID = new JTextField();
 		this.textNom = new JTextField();
@@ -38,19 +43,30 @@ public class FenetreInscription extends JFrame {
 		// boutons
 		this.buttonEnregistrer = new JButton("Enregistrer");
 		this.buttonAnnuler = new JButton("Annuler");
-		// ajout des éléments dans le conteneur
-		container.add(new JLabel("  ID"));
-		container.add(this.textID);
-		container.add(new JLabel("  Nom"));
-		container.add(this.textNom);
-		container.add(new JLabel("  Prenom"));
-		container.add(this.textPrenom);
-		container.add(this.buttonAnnuler);
-		container.add(this.buttonEnregistrer);
+		// ajout des ï¿½lï¿½ments dans le conteneur
+		containerForm.add(new JLabel("  ID"));
+		containerForm.add(this.textID);
+		containerForm.add(new JLabel("  Nom"));
+		containerForm.add(this.textNom);
+		containerForm.add(new JLabel("  Prenom"));
+		containerForm.add(this.textPrenom);
+		containerForm.add(this.buttonAnnuler);
+		containerForm.add(this.buttonEnregistrer);
+		this.messageSurLaVente = new JLabel();
+		messageSurLaVente.setVisible(false);
+		container.add(containerForm);
+		container.add(messageSurLaVente);		
 		this.pack();
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 
+	}
+	
+	public void afficherMessageSurLaVente(String message){
+		System.out.println("ICIIIIIII");
+		containerForm.setVisible(false);
+		messageSurLaVente.setText(message);
+		messageSurLaVente.setVisible(true);		
 	}
 
 }

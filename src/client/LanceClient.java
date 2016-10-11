@@ -43,7 +43,7 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 		}
 		PRODUITENVENTE.setPrix(prix);
 		PRODUITENVENTE.setWinner(winner);
-		System.out.println("Côté client: Nouveau prix ==> "+prix);
+		System.out.println("Cï¿½tï¿½ client: Nouveau prix ==> "+prix);
 		fenetreEnchere.getPrixEnchere().setText("Gagnant: "+LanceClient.ACHETEUR.getId()+"  Prix:"+LanceClient.PRODUITENVENTE.getPrix());
 		//A determiner quand on re-initialise le chronometre
 		fenetreEnchere.setCountChrono(0);
@@ -52,11 +52,30 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 	public static void main(String[] args) {
 		try {
 			LanceClient client  = new LanceClient();
-			client.executer();
+			client.run();
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void run(){
+		Remote remoteServer;
+		try {
+			remoteServer = Naming.lookup(Parametres.URL_SERVEUR);
+			FenetreInscription fenetreInscription = new FenetreInscription(remoteServer);
+			
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	public void executer() {
 		
@@ -84,8 +103,10 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 			
 			Produit produit = ((IServeur) remoteServer).demanderInscription(acheteur);
 			if (produit != null) {
-				System.out.println("client : " + acheteur.getNom() + " enregistré");
-
+				LanceClient.PRODUITENVENTE = produit;
+				LanceClient.PRODUITENVENTE.setWinner(produit.getWinner());
+				fenetreEnchere.mettreAjourPrix();
+				System.out.println("client : " + acheteur.getNom() + " enregistrï¿½");
 			} else {
 				System.out.println("fail!");
 			}

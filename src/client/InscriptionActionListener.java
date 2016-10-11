@@ -22,18 +22,25 @@ public class InscriptionActionListener implements ActionListener{
 	private void enregistrerAcheteur(Acheteur acheteur) {
 		System.out.println("Lancement de l'acheteur");
 		Produit produit = null;
+		boolean venteLancee = false;
 		try {
 			LanceClient.ACHETEUR = acheteur;
 			produit = remoteServeur.demanderInscription(acheteur);
+			if(produit != null){
+				LanceClient.PRODUITENVENTE = produit;				
+			}else{
+				fenetreInscription.afficherMessageSurLaVente("Vente en attente!");
+			}
+			
 		} catch (RemoteException e) {
 
 			e.printStackTrace();
 		}
 
 		if (produit != null) {
-			System.out.println("acheteur : " + acheteur.getNom() + " enregistré avec succés");
+			System.out.println("acheteur : " + acheteur.getNom() + " enregistrï¿½ avec succï¿½s");
 		} else {
-			System.out.println("enregistrement du acheteur échoué!");
+			System.out.println("enregistrement du acheteur ï¿½chouï¿½!");
 		}
 
 		

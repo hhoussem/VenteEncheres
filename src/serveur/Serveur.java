@@ -13,6 +13,7 @@ import java.util.Map;
 
 import client.Acheteur;
 import client.IClient;
+import client.LanceClient;
 import commun.EtatAcheteur;
 import commun.Produit;
 
@@ -65,7 +66,10 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 			c.setUrl(acheteur.getUrl());
 			System.out.println("Demande d'inscri du acheteur => " + c.getPrenom() + " " + c.getNom());
 			listeEnchere.put(c.getId(), c);
-			System.out.println("acheteur enregistré à la vente de " + produitEnVente.toString());
+			System.out.println("acheteur enregistrï¿½ ï¿½ la vente de " + produitEnVente.toString());
+			produitEnVente.setWinner(c);
+			LanceClient.PRODUITENVENTE = produitEnVente;
+			
 			return produitEnVente;
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

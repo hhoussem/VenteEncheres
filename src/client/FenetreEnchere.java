@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 import commun.Chronometre;
 import commun.EtatAcheteur;
 import commun.Parametres;
+import commun.Produit;
 import serveur.IServeur;
 
 public class FenetreEnchere extends JFrame implements ActionListener{
@@ -80,9 +81,13 @@ public class FenetreEnchere extends JFrame implements ActionListener{
 	}
 	private void initComponents(){
 
-		encherirBtn = new JButton("Enchérir");
+		encherirBtn = new JButton("Enchï¿½rir");
 		prixInput = new JTextField("", 10);
-		prixEnchere = new JLabel("Prix Enchere actuel est: 0!");
+		if(LanceClient.PRODUITENVENTE!=null){
+			prixEnchere = new JLabel("Prix Enchere actuel est "+LanceClient.PRODUITENVENTE.getPrix());
+		}else{
+			prixEnchere = new JLabel("");
+		}
 		chronoAffichage = new JLabel("Chronometre: 00");
 		this.setSize(400, 100);
 		this.add(this.buildContentPane());
@@ -101,6 +106,10 @@ public class FenetreEnchere extends JFrame implements ActionListener{
 	public void disalbeEncherir(){
 		encherirBtn.setEnabled(false);
 		prixInput.setEditable(false);
+	}
+	
+	public void mettreAjourPrix(){
+		prixEnchere.setText("Prix Enchere actuel est "+LanceClient.PRODUITENVENTE.getPrix());
 	}
 
 	@Override
