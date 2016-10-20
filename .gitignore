@@ -9,6 +9,10 @@ Desktop.ini
 .classpath
 /.settings/org.eclipse.jdt.core.prefs
 
+#intellij conf files
+VenteEncheres.iml
+.idea
+.idea/copyright/*
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
