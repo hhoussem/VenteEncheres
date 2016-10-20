@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import commun.Produit;
+	import com.seaglasslookandfeel.*;
 
 	public class FenetreInscriptionVente extends JFrame {
 
@@ -21,7 +22,7 @@ import commun.Produit;
 		public FenetreInscriptionVente(Remote r,Produit produit,Acheteur acheteur) {
 			initComponents(produit,acheteur);
 			//this.buttonEnregistrer.addActionListener(/*new InscriptionActionListener(this,r)*/);
-			
+
 		}
 
 		private void initComponents(Produit produit,Acheteur acheteur) {

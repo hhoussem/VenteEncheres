@@ -8,6 +8,10 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.UIManager;
+
+import com.seaglasslookandfeel.*;
 
 public class FenetreInscription extends JFrame {
 
@@ -29,13 +33,24 @@ public class FenetreInscription extends JFrame {
 
 	private void initComponents() {
 
+		try {
+			UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		this.setTitle("Nouveau acheteur");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(400, 400);
 		container = this.getContentPane();
 		containerForm = new Container();
-		container.setLayout(new GridLayout(4, 2));
-		containerForm.setLayout(new GridLayout(4, 2));
+		container.setLayout(new GridLayout(4, 4));
+		containerForm.setLayout(new GridLayout(4, 4));
 		// zone de texte
 		this.textID = new JTextField();
 		this.textNom = new JTextField();
@@ -56,7 +71,7 @@ public class FenetreInscription extends JFrame {
 		messageSurLaVente.setVisible(false);
 		container.add(containerForm);
 		container.add(messageSurLaVente);		
-		this.pack();
+		//this.pack();
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 
