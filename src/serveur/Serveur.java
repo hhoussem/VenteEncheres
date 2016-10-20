@@ -19,25 +19,35 @@ import commun.Produit;
 
 public class Serveur extends UnicastRemoteObject implements IServeur {
 
-	private Map<String, Acheteur> listeEnchere = new HashMap<String, Acheteur>();
+	static private Map<String, Acheteur> listeEnchere = new HashMap<String, Acheteur>();
 	private List<Acheteur> listeTemporaire = new ArrayList<Acheteur>();
 	private Produit produitEnVente=null;
-	private final int NOMBRE_MAX_CLIENT = 3;
+	private final int NOMBRE_MAX_CLIENT = 2;
 
 	private static final long serialVersionUID = 1L;
 
 	protected Serveur() throws RemoteException {
 		super();
 	}
-	
+
+	public Map<String, Acheteur> getListeEnchere() {
+		return listeEnchere;
+	}
+
+	public List<Acheteur> getListeTemporaire() {
+		return listeTemporaire;
+	}
+
 	@Override
 	public Produit getProduitEnVente() {
 		return produitEnVente;
 	}
 
-	public void setProduitEnVente(Produit produit) {
-		this.produitEnVente = produit;
-		System.out.println("Produit en vente: " + produit.toString());
+	public synchronized void setProduitEnVente(Produit produit) {
+		if(produit != null) {
+			this.produitEnVente = produit;
+			System.out.println("Produit en vente: " + produit.toString());
+		}
 	}
 
 	@Override
@@ -47,6 +57,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 			System.out.println("Valider l'inscri du acheteur => " + c.getPrenom() + " " + c.getNom());
 			if (listeEnchere.size() < NOMBRE_MAX_CLIENT - 1) {
 				listeEnchere.put(c.getId(), c);
+				notify();
 			}
 			for (int i = listeTemporaire.size() - 1; i >= 0; i--) {
 				if (listeTemporaire.get(i).getId() == acheteur.getId()) {
@@ -66,6 +77,8 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 			c.setUrl(acheteur.getUrl());
 			System.out.println("Demande d'inscri du acheteur => " + c.getPrenom() + " " + c.getNom());
 			listeEnchere.put(c.getId(), c);
+			System.out.println(listeEnchere.size());
+			notify();
 			System.out.println("acheteur enregistr� � la vente de " + produitEnVente.toString());
 			produitEnVente.setWinner(c);
 			LanceClient.PRODUITENVENTE = produitEnVente;
@@ -150,13 +163,21 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 		return true;
 	}
 
-	@Override
-	public boolean lancerLavente(Produit produit, int nb_inscrit) throws RemoteException {
+	protected synchronized boolean lancerLavente(Produit produit) {
 
-		if (nb_inscrit == NOMBRE_MAX_CLIENT) {
-
+		while (listeEnchere.size() != NOMBRE_MAX_CLIENT) {
+			try {
+				System.out.println("waiting");
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				System.out.println("error!");
+				return false;
+			}
 		}
-		return false;
+		System.out.println("notified!");
+		updateBidders(produit.getPrix(), null);
+		return true;
 	}
 
 }

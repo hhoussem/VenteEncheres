@@ -27,7 +27,8 @@ public class InscriptionActionListener implements ActionListener{
 			LanceClient.ACHETEUR = acheteur;
 			produit = remoteServeur.demanderInscription(acheteur);
 			if(produit != null){
-				LanceClient.PRODUITENVENTE = produit;				
+				LanceClient.PRODUITENVENTE = produit;
+				new FenetreInscriptionVente(this.remoteServeur, produit, acheteur);
 			}else{
 				fenetreInscription.afficherMessageSurLaVente("Vente en attente!");
 			}
@@ -36,13 +37,6 @@ public class InscriptionActionListener implements ActionListener{
 
 			e.printStackTrace();
 		}
-
-		if (produit != null) {
-			System.out.println("acheteur : " + acheteur.getNom() + " enregistr� avec succ�s");
-		} else {
-			System.out.println("enregistrement du acheteur �chou�!");
-		}
-
 		
 	}
 	
