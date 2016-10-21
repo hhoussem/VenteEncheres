@@ -51,11 +51,11 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	}
 
 	@Override
-	public Produit validerInscription(Acheteur acheteur) throws RemoteException {
+	public synchronized Produit validerInscription(Acheteur acheteur) throws RemoteException {
 		try {
 			Acheteur c = new Acheteur(acheteur.getId(), acheteur.getNom(), acheteur.getPrenom());
 			System.out.println("Valider l'inscri du acheteur => " + c.getPrenom() + " " + c.getNom());
-			if (listeEnchere.size() < NOMBRE_MAX_CLIENT - 1) {
+			if (listeEnchere.size() < NOMBRE_MAX_CLIENT) {
 				listeEnchere.put(c.getId(), c);
 				notify();
 			}
@@ -71,19 +71,16 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	}
 
 	@Override
-	synchronized public Produit demanderInscription(Acheteur acheteur) throws RemoteException {
+	public Produit demanderInscription(Acheteur acheteur) throws RemoteException {
 		try {
 			Acheteur c = new Acheteur(acheteur.getId(), acheteur.getNom(), acheteur.getPrenom());
 			c.setUrl(acheteur.getUrl());
 			System.out.println("Demande d'inscri du acheteur => " + c.getPrenom() + " " + c.getNom());
-			listeEnchere.put(c.getId(), c);
-			System.out.println(listeEnchere.size());
-			notify();
+			listeTemporaire.add(c);
 			System.out.println("acheteur enregistr� � la vente de " + produitEnVente.toString());
-			produitEnVente.setWinner(c);
 			LanceClient.PRODUITENVENTE = produitEnVente;
 			
-			return produitEnVente;
+			return validerInscription(c);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			return null;
