@@ -15,7 +15,6 @@ class EncherirActionListener implements ActionListener {
 	public EncherirActionListener(FenetreEnchere window, Remote r) {
 		this.fenEnchere = window;
 		this.remote = (IServeur) r;
-
 	}
 
 	synchronized public void actionPerformed(ActionEvent e) {
@@ -27,11 +26,11 @@ class EncherirActionListener implements ActionListener {
 			ex.printStackTrace();
 		}
 		fenEnchere.prixInput.setText("");
-		Produit pro = LanceClient.PRODUITENVENTE;
+		Produit produit = LanceClient.PRODUITENVENTE;
 		String idAcheteur = LanceClient.ACHETEUR.getId();
 
 		try {
-			remote.encherir(idAcheteur, pro, prix);
+			remote.encherir(idAcheteur, produit, prix);
 		} catch (RemoteException e1) {
 			e1.printStackTrace();
 		}

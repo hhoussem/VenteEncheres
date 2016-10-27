@@ -6,11 +6,7 @@ import javax.swing.Timer;
 
 public class Chronometre extends Timer{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-
 
 	public Chronometre(int delay, ActionListener listener) {
 		super(delay, listener);
