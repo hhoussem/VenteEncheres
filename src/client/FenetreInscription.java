@@ -74,6 +74,11 @@ public class FenetreInscription extends JFrame {
 		//this.pack();
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
+		
+		if(LanceClient.ACHETEUR!=null){
+			textID.setText(LanceClient.ACHETEUR.getId());
+			textID.setEnabled(false);
+		}
 
 	}
 	

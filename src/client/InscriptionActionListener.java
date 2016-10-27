@@ -22,13 +22,12 @@ public class InscriptionActionListener implements ActionListener{
 	private void enregistrerAcheteur(Acheteur acheteur) {
 		System.out.println("Lancement de l'acheteur");
 		Produit produit = null;
-		boolean venteLancee = false;
 		try {
 			LanceClient.ACHETEUR = acheteur;
 			produit = remoteServeur.demanderInscription(acheteur);
 			if(produit != null){
 				LanceClient.PRODUITENVENTE = produit;
-				new FenetreInscriptionVente(this.remoteServeur, produit, acheteur);
+				//new FenetreInscriptionVente(this.remoteServeur, produit, acheteur);
 			}else{
 				fenetreInscription.afficherMessageSurLaVente("Vente en attente!");
 			}
@@ -37,7 +36,6 @@ public class InscriptionActionListener implements ActionListener{
 
 			e.printStackTrace();
 		}
-		
 	}
 	
 	@Override
@@ -47,8 +45,10 @@ public class InscriptionActionListener implements ActionListener{
 					|| fenetreInscription.textNom.getText().equals("")) {
 				JOptionPane.showMessageDialog(null, "vous devez remplir tous les champs!");
 			} else {
-
-				enregistrerAcheteur(new Acheteur(fenetreInscription.textID.getText(), fenetreInscription.textNom.getText(), fenetreInscription.textPrenom.getText()));
+				Acheteur acheteur = LanceClient.ACHETEUR;
+				acheteur.setNom(fenetreInscription.textNom.getText());
+				acheteur.setPrenom(fenetreInscription.textPrenom.getText());
+				enregistrerAcheteur(acheteur);
 			}
 		}
 		if (e.getSource().equals(fenetreInscription.buttonAnnuler)) {

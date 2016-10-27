@@ -23,6 +23,8 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 	 FenetreInscription fenetreInsciption;
 	 FenetreEnchere fenetreEnchere;
 	 
+	IServeur remoteServer;
+		
 	private static final long serialVersionUID = 1L;
 
 	
@@ -44,12 +46,25 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 		PRODUITENVENTE.setPrix(prix);
 		PRODUITENVENTE.setWinner(winner);
 		System.out.println("C�t� client: Nouveau prix ==> "+prix);
-		fenetreEnchere.getPrixEnchere().setText("Gagnant: "+LanceClient.ACHETEUR.getId()+"  Prix:"+LanceClient.PRODUITENVENTE.getPrix());
+		fenetreEnchere.getPrixEnchere().setText("Gagnant: "+LanceClient.PRODUITENVENTE.getWinner().getId()+"  Prix:"+LanceClient.PRODUITENVENTE.getPrix());
 		//A determiner quand on re-initialise le chronometre
 		fenetreEnchere.setCountChrono(0);
 	}
+	
+	@Override
+	public void notifierNoulleVente(Produit produit) throws RemoteException{
+		if(fenetreEnchere==null){
+			fenetreEnchere = new FenetreEnchere("ENCHERE "+ACHETEUR.getId()+" - "+ACHETEUR.getNom(), remoteServer);
+		}
+		PRODUITENVENTE = produit;
+		fenetreEnchere.setEncherMessage("Produit en cours de Vente :"+produit.getNom()+"/"+produit.getDescription()+" Prix initial:"+produit.getPrix());
+	}
 
 	public static void main(String[] args) {
+		
+		//new FenetreEnchere("TEST", null);
+		//if(true) return;
+		
 		try {
 			LanceClient client  = new LanceClient();
 			client.run();
@@ -60,22 +75,38 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 	}
 	
 	public void run(){
-		Remote remoteServer;
+		initClient();
+		FenetreInscription fenetreInscription = new FenetreInscription(remoteServer);
+	}
+	
+	public void initClient(){
 		try {
-			remoteServer = Naming.lookup(Parametres.URL_SERVEUR);
-			FenetreInscription fenetreInscription = new FenetreInscription(remoteServer);
+			//Initialisatoin du client
+			Random rand = new Random();
+			int port =  rand.nextInt(60000-10000) + 10000;
+			LocateRegistry.createRegistry(port);
+			Acheteur acheteur = new Acheteur("client"+port, "", "");
+			String url ="//localhost:"+port+"/client";
+			acheteur.setUrl(url);
+			LanceClient.ACHETEUR = acheteur;
+			Naming.bind(url, this);
+			
+			//connexion au serveur
+			remoteServer = (IServeur) Naming.lookup(Parametres.URL_SERVEUR);
 			
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AlreadyBoundException e) {
+			e.printStackTrace();
+		} catch (java.rmi.AlreadyBoundException e) {
 			e.printStackTrace();
 		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Serveur Introuvable");
 			e.printStackTrace();
 		}
-		
+
 	}
 	public void executer() {
 		
@@ -127,7 +158,7 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 	}
 
 	@Override
-	public void venterTerminee(double prix, Acheteur winner) throws RemoteException {
+	public synchronized void venterTerminee(double prix, Acheteur winner) throws RemoteException {
 		String msg = "VENTE TERMINEE, PRIX="+prix+" GAGNANT: "+winner.getNom();
 		System.out.println(msg);
 		fenetreEnchere.getPrixEnchere().setText(msg);

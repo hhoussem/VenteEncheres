@@ -1,6 +1,7 @@
 package client;
 
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.Remote;
@@ -63,13 +64,17 @@ public class FenetreEnchere extends JFrame implements ActionListener{
 
 	public JPanel buildContentPane() {
 		JPanel panel = new JPanel();
+		JPanel msgPanel = new JPanel();
 		panel.setLayout(new FlowLayout());
 		
 		panel.add(chronoAffichage);
 		
 		panel.add(prixInput);
 		panel.add(encherirBtn);
-		panel.add(prixEnchere);		
+		msgPanel.setLayout(new GridLayout());
+		msgPanel.setSize(400,300);
+		msgPanel.add(prixEnchere);
+		panel.add(msgPanel);	
 		prixInput.setVisible(false);
 		encherirBtn.setVisible(false);
 
@@ -81,12 +86,12 @@ public class FenetreEnchere extends JFrame implements ActionListener{
 	}
 	private void initComponents(){
 
-		encherirBtn = new JButton("Ench�rir");
+		encherirBtn = new JButton("Encherir");
 		prixInput = new JTextField("", 10);
 		if(LanceClient.PRODUITENVENTE!=null){
 			prixEnchere = new JLabel("Prix Enchere actuel est "+LanceClient.PRODUITENVENTE.getPrix());
 		}else{
-			prixEnchere = new JLabel("");
+			prixEnchere = new JLabel("msdjqfmsdjfqlkjsdmqfjsldfjmqsdjfqjsdmfjqsldfjsmjflqsjfmsjflsjdfmsjdfmsjfqmsjdfls");
 		}
 		chronoAffichage = new JLabel("Chronometre: 00");
 		this.setSize(400, 100);
@@ -96,6 +101,10 @@ public class FenetreEnchere extends JFrame implements ActionListener{
 		this.setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
+	}
+	
+	public void setEncherMessage(String msg){
+		prixEnchere.setText(msg);
 	}
 	
 	public void enableEncherir(){
