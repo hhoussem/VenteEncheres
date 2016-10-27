@@ -60,8 +60,8 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	public synchronized Produit validerInscription(Acheteur acheteur) throws RemoteException {
 		try {
 			Acheteur c = acheteur;
-			System.out.println("Valider l'inscri du acheteur => " + c.getPrenom() + " " + c.getNom());
-			if (listeEnchere.size() <= NOMBRE_MAX_CLIENT) {
+			System.out.println("Valider l'inscri de l'acheteur => " + c.getPrenom() + " " + c.getNom());
+			if (listeEnchere.size() < NOMBRE_MAX_CLIENT) {
 				listeEnchere.put(c.getId(), c);
 				notify();
 			}
@@ -79,7 +79,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	protected synchronized boolean lancerLavente() {
 		while (listeEnchere.size() != NOMBRE_MAX_CLIENT) {
 			try {
-				System.out.println("server is waiting for ...");
+				System.out.println("server is waiting for "+(NOMBRE_MAX_CLIENT - listeTemporaire.size())+" clients");
 				wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -145,12 +145,14 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 			}
 		}
 
-		/*
-		 * try { System.out.println("Attentre 20 secondes");
-		 * //wait(20000);//attendre un instant avant de lancer la vente suivante
-		 * } catch (InterruptedException e) { // TODO Auto-generated catch block
-		 * e.printStackTrace(); }
-		 */
+		
+		try {
+			System.out.println("Attentre 10 secondes avant la prochaine vente");
+			wait(10000);// attendre un instant avant de lancer la vente suivante
+		} catch (InterruptedException e) { // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 
 		ETAT_VENTE_TERMINEE = true;
 		notify();
 	}
@@ -189,7 +191,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 		for (Acheteur acheteur : listeEnchere.values()) {
 			try {
 				IClient client = connecterAuClient(acheteur);
-				client.notifierNoulleVente(produit);
+				client.notifierNouvelleVente(produit);
 			} catch (ClientConnexionFailException | RemoteException e) {
 				e.printStackTrace();
 			}

@@ -5,6 +5,8 @@ import java.awt.event.ActionListener;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import javax.swing.JOptionPane;
+
 import commun.Produit;
 import serveur.IServeur;
 
@@ -22,8 +24,8 @@ class EncherirActionListener implements ActionListener {
 		try {
 			prix = Double.parseDouble(fenEnchere.prixInput.getText());
 		} catch (NumberFormatException ex) {
-			prix = 0;
-			ex.printStackTrace();
+			JOptionPane.showMessageDialog(null, "prix invalide !");
+			
 		}
 		fenEnchere.prixInput.setText("");
 		Produit produit = LanceClient.PRODUITENVENTE;

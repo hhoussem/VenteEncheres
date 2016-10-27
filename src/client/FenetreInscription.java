@@ -82,7 +82,7 @@ public class FenetreInscription extends JFrame {
 	}
 
 	public void afficherMessageSurLaVente(String message) {
-		System.out.println("ICIIIIIII");
+		System.out.println("message :"+message);
 		containerForm.setVisible(false);
 		messageSurLaVente.setText(message);
 		messageSurLaVente.setVisible(true);
