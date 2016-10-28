@@ -50,8 +50,11 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 	}
 
 	@Override
-	public void notifierNoulleVente(Produit produit) throws RemoteException {
+	public void notifierNouvelleVente(Produit produit) throws RemoteException {
 		if (fenetreEnchere == null) {
+			if(fenetreInsciption != null){
+			fenetreInsciption.dispose();
+			}
 			fenetreEnchere = new FenetreEnchere("ENCHERE " + ACHETEUR.getId() + " - " + ACHETEUR.getNom(),
 					remoteServer);
 		}
@@ -70,7 +73,7 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 		}
 		PRODUITENVENTE.setPrix(prix);
 		PRODUITENVENTE.setWinner(winner);
-		System.out.println("C�t� client: Nouveau prix ==> " + prix);
+		System.out.println("client: Nouveau prix ==> " + prix);
 		fenetreEnchere.getPrixEnchere().setText("Gagnant: " + LanceClient.PRODUITENVENTE.getWinner().getId() + "  Prix:"
 				+ LanceClient.PRODUITENVENTE.getPrix());
 		// A determiner quand on re-initialise le chronometre
