@@ -19,8 +19,7 @@ import commun.exception.ClientConnexionFailException;
 
 public class Serveur extends UnicastRemoteObject implements IServeur {
 
-	static private Map<String, Acheteur> listeEnchere = new HashMap<String, Acheteur>();
-	private List<Acheteur> listeTemporaire = new ArrayList<Acheteur>();
+	static private Map<String, Acheteur> listeAcheteurs = new HashMap<String, Acheteur>();
 	private Produit produitEnVente = null;
 	private final int NOMBRE_MAX_CLIENT = 2;
 	private static boolean ETAT_VENTE_TERMINEE = true; // Vente en cours ou
@@ -39,61 +38,40 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	}
 
 	@Override
-	public synchronized Produit demanderInscription(Acheteur acheteur) throws RemoteException {
-		try {
-			Acheteur c = new Acheteur(acheteur.getId(), acheteur.getNom(), acheteur.getPrenom());
-			c.setUrl(acheteur.getUrl());
-			System.out.println("Demande d'inscri du acheteur => " + c.getPrenom() + " " + c.getNom());
-			listeTemporaire.add(c);
-			// System.out.println("acheteur enregistr� � la vente de " +
-			// produitEnVente.toString());
-			// LanceClient.PRODUITENVENTE = produitEnVente;
+	public synchronized Produit demanderInscription(Acheteur _acheteur) throws RemoteException {
 
-			return validerInscription(c);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	@Override
-	public synchronized Produit validerInscription(Acheteur acheteur) throws RemoteException {
+		Acheteur acheteur = new Acheteur(_acheteur.getId(), _acheteur.getNom(), _acheteur.getPrenom());
+		acheteur.setUrl(_acheteur.getUrl());
+		System.out.println("Inscription de l'acheteur => " + acheteur.toString());
 		try {
-			Acheteur c = acheteur;
-			System.out.println("Valider l'inscri de l'acheteur => " + c.getPrenom() + " " + c.getNom());
-			if (listeEnchere.size() < NOMBRE_MAX_CLIENT) {
-				listeEnchere.put(c.getId(), c);
+			if (listeAcheteurs.size() < NOMBRE_MAX_CLIENT) {
+				listeAcheteurs.put(acheteur.getId(), acheteur);
 				notify();
-			}
-			for (int i = listeTemporaire.size() - 1; i >= 0; i--) {
-				if (listeTemporaire.get(i).getId() == acheteur.getId()) {
-					listeTemporaire.remove(i);
-				}
 			}
 			return produitEnVente;
 		} catch (Exception e) {
 			return null;
 		}
+
 	}
 
 	protected synchronized boolean lancerLavente() {
-		while (listeEnchere.size() != NOMBRE_MAX_CLIENT) {
+		while (listeAcheteurs.size() != NOMBRE_MAX_CLIENT) {
 			try {
-				System.out.println("server is waiting for "+(NOMBRE_MAX_CLIENT - listeTemporaire.size())+" clients");
+				System.out.println("server is waiting for "+(NOMBRE_MAX_CLIENT - listeAcheteurs.size())+" clients");
 				wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-				System.out.println("error!");
 				return false;
 			}
 		}
-		System.out.println("notified, vente va commencer!");
+		System.out.println("nombre de clients max atteint, vente commencé !");
 		return true;
 	}
 
 	@Override
 	synchronized public boolean encherir(String idAcheteur, Produit produit, double prix) throws RemoteException {
-		Acheteur acheteur = listeEnchere.get(idAcheteur);
+		Acheteur acheteur = listeAcheteurs.get(idAcheteur);
 		if (acheteur != null) {
 			if (prix > produitEnVente.getPrix()) {
 				acheteur.setEtat(EtatAcheteur.ENCHERISSEMENT);
@@ -113,7 +91,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 
 	private void updateBidders(double prix, Acheteur winner) {
 		IClient client;
-		for (Acheteur acheteur : listeEnchere.values()) {
+		for (Acheteur acheteur : listeAcheteurs.values()) {
 			try {
 				client = connecterAuClient(acheteur);
 				client.updatePrice(prix, winner);
@@ -125,7 +103,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 
 	private boolean verifierSiVenteTerminee() {
 		boolean terminee = true;
-		for (Acheteur acheteur : listeEnchere.values()) {
+		for (Acheteur acheteur : listeAcheteurs.values()) {
 			if (!acheteur.getEtat().equals(EtatAcheteur.TERMINE)) {
 				terminee = false;
 				break;
@@ -136,7 +114,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 
 	private synchronized void notifierVenteTerminee() {
 		IClient client;
-		for (Acheteur acheteur : listeEnchere.values()) {
+		for (Acheteur acheteur : listeAcheteurs.values()) {
 			try {
 				client = connecterAuClient(acheteur);
 				client.venteTerminee(produitEnVente.getPrix(), produitEnVente.getWinner());
@@ -161,7 +139,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	synchronized public void tempsEcoule(String idAcheteur) throws RemoteException {
 		if (ETAT_VENTE_TERMINEE)
 			return;
-		Acheteur acheteur = listeEnchere.get(idAcheteur);
+		Acheteur acheteur = listeAcheteurs.get(idAcheteur);
 		if (acheteur != null) {
 			acheteur.setEtat(EtatAcheteur.TERMINE);
 			if (verifierSiVenteTerminee()) {
@@ -181,14 +159,13 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-
+		
 		ETAT_VENTE_TERMINEE = false;
 		setProduitEnVente(produit);
-		for (Acheteur acheteur : listeEnchere.values()) {
+		for (Acheteur acheteur : listeAcheteurs.values()) {
 			try {
 				IClient client = connecterAuClient(acheteur);
 				client.notifierNouvelleVente(produit);
