@@ -22,8 +22,13 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	static private Map<String, Acheteur> listeAcheteurs = new HashMap<String, Acheteur>();
 	private Produit produitEnVente = null;
 	private final int NOMBRE_MAX_CLIENT = 2;
-	private static boolean ETAT_VENTE_TERMINEE = true; // Vente en cours ou
-														// vente terminée
+	private static boolean ETAT_VENTE_VALIDEE = true; // Vente en cours ou vente validée par les acheteurs
+	
+
+	private List<Produit> produits = new ArrayList<Produit>();
+	
+	private int indexVenteEncours = 0;
+	
 
 	private static final long serialVersionUID = 1L;
 
@@ -74,13 +79,11 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 		Acheteur acheteur = listeAcheteurs.get(idAcheteur);
 		if (acheteur != null) {
 			if (prix > produitEnVente.getPrix()) {
+				if(produitEnVente.getWinner()!=null && produitEnVente.getWinner().getEtat()!=EtatAcheteur.TERMINE) produitEnVente.getWinner().setEtat(EtatAcheteur.EN_ATTENTE);
 				acheteur.setEtat(EtatAcheteur.ENCHERISSEMENT);
 				produitEnVente.setPrix(prix);
 				produitEnVente.setWinner(acheteur);
 				updateBidders(prix, acheteur);
-				if (verifierSiVenteTerminee()) {
-					notifierVenteTerminee();
-				}
 			}
 		} else {
 			System.out.println("Encherir: L'acheteur n'est pas encore inscrit!");
@@ -104,7 +107,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	private boolean verifierSiVenteTerminee() {
 		boolean terminee = true;
 		for (Acheteur acheteur : listeAcheteurs.values()) {
-			if (!acheteur.getEtat().equals(EtatAcheteur.TERMINE)) {
+			if (acheteur.getEtat().equals(EtatAcheteur.EN_ATTENTE)) {
 				terminee = false;
 				break;
 			}
@@ -114,31 +117,47 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 
 	private synchronized void notifierVenteTerminee() {
 		IClient client;
+		Produit prochainProduit = null;
+		if((produits.size()-1)>indexVenteEncours) {
+			prochainProduit = produits.get(indexVenteEncours+1);
+		}
 		for (Acheteur acheteur : listeAcheteurs.values()) {
 			try {
 				client = connecterAuClient(acheteur);
-				client.venteTerminee(produitEnVente.getPrix(), produitEnVente.getWinner());
+				client.venteTerminee(produitEnVente.getPrix(), produitEnVente.getWinner(), prochainProduit);
 			} catch (RemoteException | ClientConnexionFailException e) {
 				System.out.println("Impossible de joindre l'acheteur: " + acheteur.getNom() + " :" + e.getMessage());
 			}
 		}
-
-		
-		try {
-			System.out.println("Attentre 10 secondes avant la prochaine vente");
-			wait(10000);// attendre un instant avant de lancer la vente suivante
-		} catch (InterruptedException e) { // TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		 
-		ETAT_VENTE_TERMINEE = true;
-		notify();
 	}
 
 	@Override
+	synchronized public void validerVente(String idAcheteur) throws RemoteException {
+		Acheteur acheteur = listeAcheteurs.get(idAcheteur);
+		if (acheteur != null) {
+			acheteur.setaValiderLaVente(true);
+			boolean tousAcheteursOntValide = true;
+			for(Acheteur acht:listeAcheteurs.values()){
+				if(!acht.isaValiderLaVente()){
+					tousAcheteursOntValide = false;
+					break;
+				}
+			}
+			if(tousAcheteursOntValide){
+				ETAT_VENTE_VALIDEE = true;
+				for(Acheteur acht:listeAcheteurs.values()){
+					acht.setaValiderLaVente(false);
+				}
+				notify();
+			}
+		} else {
+			System.out.println("Encherir: L'acheteur n'est pas encore inscrit!");
+		}
+	}
+	
+	@Override
 	synchronized public void tempsEcoule(String idAcheteur) throws RemoteException {
-		if (ETAT_VENTE_TERMINEE)
-			return;
+		//if (ETAT_VENTE_VALIDEE) return;
 		Acheteur acheteur = listeAcheteurs.get(idAcheteur);
 		if (acheteur != null) {
 			acheteur.setEtat(EtatAcheteur.TERMINE);
@@ -155,15 +174,20 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	 */
 	public synchronized void mettreAuxEcheres(Produit produit) {
 
-		while (!ETAT_VENTE_TERMINEE) {
+		/*
+		 * On attend que tous les acheteurs ont validé la vente encours 
+		 * avant de lancer la prochaine
+		 */
+		while (!ETAT_VENTE_VALIDEE) {
 			try {
 				wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		ETAT_VENTE_TERMINEE = false;
+
+		System.out.println("Mise au enchere du produit : " + produits.get(indexVenteEncours));
+		ETAT_VENTE_VALIDEE = false;
 		setProduitEnVente(produit);
 		for (Acheteur acheteur : listeAcheteurs.values()) {
 			try {
@@ -175,9 +199,36 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 		}
 
 	}
+	
+	public Produit getProduitEncours(){
+		return produits.get(indexVenteEncours);
+	}
+	public int getIndexVenteEncours() {
+		return indexVenteEncours;
+	}
+
+	public void setIndexVenteEncours(int indexVenteEncours) {
+		this.indexVenteEncours = indexVenteEncours;
+	}
+
+	public void incrementerIndexProduit(){
+		indexVenteEncours++;
+	}
+	public List<Produit> getProduits() {
+		return produits;
+	}
+
+	public void setProduits(List<Produit> produits) {
+		this.produits = produits;
+	}
+
+
 
 	protected Serveur() throws RemoteException {
 		super();
+		produits.add(new Produit("Telephone", 500, "ecran 5 pouces, 16go"));
+		produits.add(new Produit("Ordinateur Portable", 150, "DELL 15pources, 4go, 1To"));
+		produits.add(new Produit("Samsung S6", 500, "ecran 5.5 pouces, 3go"));
 	}
 
 	@Override

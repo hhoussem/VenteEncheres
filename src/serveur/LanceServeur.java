@@ -4,11 +4,7 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.util.ArrayList;
-import java.util.List;
-
 import commun.Parametres;
-import commun.Produit;
 
 public class LanceServeur {
 
@@ -23,15 +19,10 @@ public class LanceServeur {
 			System.out.println("Serveur lance");
 
 			serveur.lancerLavente();
-			List<Produit> produits = new ArrayList<Produit>();
-			produits.add(new Produit("Telephone", 500, "ecran 5 pouces, 16go"));
-			produits.add(new Produit("Ordinateur Portable", 150, "DELL 15pources, 4go, 1To"));
-			produits.add(new Produit("Samsung S6", 500, "ecran 5.5 pouces, 3go"));
-
 			int i = 0;
-			while (i < produits.size()) {
-				System.out.println("Mise au enchere du produit : " + produits.get(i));
-				serveur.mettreAuxEcheres(produits.get(i));
+			while (i < serveur.getProduits().size()) {
+				serveur.mettreAuxEcheres(serveur.getProduits().get(i));
+				serveur.setIndexVenteEncours(i);			
 				i++;
 			}
 		} catch (RemoteException e) {

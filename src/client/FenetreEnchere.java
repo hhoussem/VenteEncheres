@@ -21,6 +21,7 @@ import serveur.IServeur;
 public class FenetreEnchere extends JFrame implements ActionListener {
 
 	JButton encherirBtn;
+	JButton validerBtn;
 	JTextField prixInput;
 	JLabel prixEnchere;
 	JLabel chronoAffichage;
@@ -36,6 +37,7 @@ public class FenetreEnchere extends JFrame implements ActionListener {
 		initComponents();
 		this.serveur = (IServeur) remote;
 		encherirBtn.addActionListener(new EncherirActionListener(this, remote));
+		validerBtn.addActionListener(new ValiderActionListener(this, remote));
 		this.setTitle(title);
 		chrono = new Chronometre(1000, this);
 		chrono.startTimer();
@@ -49,9 +51,9 @@ public class FenetreEnchere extends JFrame implements ActionListener {
 		panel.add(prixInput);
 		panel.add(encherirBtn);
 		msgPanel.setLayout(new GridLayout());
-		msgPanel.setSize(400, 300);
 		msgPanel.add(prixEnchere);
 		panel.add(msgPanel);
+		panel.add(validerBtn);
 		prixInput.setVisible(false);
 		encherirBtn.setVisible(false);
 		return panel;
@@ -60,6 +62,8 @@ public class FenetreEnchere extends JFrame implements ActionListener {
 	private void initComponents() {
 
 		encherirBtn = new JButton("Encherir");
+		validerBtn = new JButton("Valider");
+		validerBtn.setVisible(false);
 		prixInput = new JTextField("", 10);
 		if (LanceClient.PRODUITENVENTE != null) {
 			prixEnchere = new JLabel("Prix Enchere actuel est " + LanceClient.PRODUITENVENTE.getPrix());
@@ -67,7 +71,7 @@ public class FenetreEnchere extends JFrame implements ActionListener {
 			prixEnchere = new JLabel("aucun produit en vente");
 		}
 		chronoAffichage = new JLabel("Chronometre: 00");
-		this.setSize(400, 100);
+		this.setSize(425, 150);
 		this.add(this.buildContentPane());
 		encherirBtn.setVisible(true);
 		prixInput.setVisible(true);
@@ -79,8 +83,8 @@ public class FenetreEnchere extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		countChrono++;
-		chronoAffichage.setText("Chronometre: 0" + countChrono);
-		if (countChrono == Parametres.TEMPS_ATTENTE_ENCHERE) {
+		chronoAffichage.setText("Chronometre: 0" + (Parametres.TEMPS_ATTENTE_ENCHERE - countChrono));
+		if (countChrono >= Parametres.TEMPS_ATTENTE_ENCHERE) {
 			try {
 				serveur.tempsEcoule(LanceClient.ACHETEUR.getId());
 				chronoAffichage.setText("TEMPS ECOULE!!");
@@ -90,6 +94,20 @@ public class FenetreEnchere extends JFrame implements ActionListener {
 			} catch (RemoteException e1) {
 				System.out.println("Erreur lors de la notification du serveur!");
 			}
+		}
+	}
+	
+	/**
+	 * Afficher le message quand une vente est terminée et que l'acheteur doit passer à la prochaine vent
+	 * @param msg: message à afficher
+	 * @param finEchere: vrai si c'est la derniere vent (fin de l'enchere) 
+	 */
+	public void setMessageVente(String msg, boolean finEnchere){
+		prixEnchere.setText(msg);
+		if(!finEnchere){
+			validerBtn.setVisible(true);
+		}else{
+			validerBtn.setVisible(false);
 		}
 	}
 

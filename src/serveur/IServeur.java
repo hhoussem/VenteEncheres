@@ -15,4 +15,12 @@ public interface IServeur extends Remote {
 
 	public void tempsEcoule(String idAcheteur) throws RemoteException;
 
+	/**
+	 * Quand une vente est terminée les clients doivent valider la vente en appelant cette methode
+	 * puis on passe à la vente suivante
+	 * @param idAcheteur
+	 * @throws RemoteException
+	 */
+	void validerVente(String idAcheteur) throws RemoteException;
+
 }

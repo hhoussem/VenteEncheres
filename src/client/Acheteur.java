@@ -15,6 +15,8 @@ public class Acheteur implements Serializable {
 	private String url;
 	private int port;
 	private EtatAcheteur etat = EtatAcheteur.EN_ATTENTE;
+	
+	private boolean aValiderLaVente = false;
 
 	private static final long serialVersionUID = 1L;
 
@@ -80,6 +82,20 @@ public class Acheteur implements Serializable {
 
 	public void setEtat(EtatAcheteur etat) {
 		this.etat = etat;
+	}
+
+	/**
+	 * @return the aValiderLaVente
+	 */
+	public boolean isaValiderLaVente() {
+		return aValiderLaVente;
+	}
+
+	/**
+	 * @param aValiderLaVente the aValiderLaVente to set
+	 */
+	public void setaValiderLaVente(boolean aValiderLaVente) {
+		this.aValiderLaVente = aValiderLaVente;
 	}
 
 }

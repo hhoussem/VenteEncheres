@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.nio.channels.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
@@ -31,9 +30,13 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 	}
 
 	public static void main(String[] args) {
-
-		// new FenetreEnchere("TEST", null);
-		// if(true) return;
+		/*
+		 FenetreEnchere fenetreEnchere = new FenetreEnchere("TEST", null);
+		 String msg = "<html><b>VENTE TERMINEE, PRIX=" + "750" + " GAGNANT: " + "Toto be caotpa</b><br/><br/>";
+		 msg+="<p>PRODUIT SUIVANT: PIZZA 500g 4 fromages!</p></html>";
+		fenetreEnchere.setMessageVente(msg, true);
+		//fenetreEnchere.getVenteSuivante().setText("PRODUIT SUIVANT: PIZZA 500g 4 fromages!");
+		 if(true) return;*/
 
 		try {
 			LanceClient client = new LanceClient();
@@ -64,6 +67,9 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 		PRODUITENVENTE = produit;
 		fenetreEnchere.setEncherMessage("Produit en cours de Vente :" + produit.getNom() + "/"
 				+ produit.getDescription() + " Prix initial:" + produit.getPrix());
+		fenetreEnchere.setCountChrono(0);
+		fenetreEnchere.getChrono().restart();
+		fenetreEnchere.enableEncherir();
 	}
 
 	@Override
@@ -76,17 +82,27 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 		System.out.println("client: Nouveau prix ==> " + prix);
 		fenetreEnchere.getPrixEnchere().setText("Gagnant: " + LanceClient.PRODUITENVENTE.getWinner().getId() + "  Prix:"
 				+ LanceClient.PRODUITENVENTE.getPrix());
-		// A determiner quand on re-initialise le chronometre
+		// On reinitialise le chronometre du client qui vient d'encherir
 		if(ACHETEUR.getId().equals(winner.getId())) fenetreEnchere.setCountChrono(0);
 	}
 
 	@Override
-	public synchronized void venteTerminee(double prix, Acheteur winner) throws RemoteException {
-		if (winner != null) {
-			String msg = "VENTE TERMINEE, PRIX=" + prix + " GAGNANT: " + winner.getNom();
-			System.out.println(msg);
-			fenetreEnchere.getPrixEnchere().setText(msg);
-		}
+	public synchronized void venteTerminee(double prix, Acheteur winner, Produit prochainProduit) throws RemoteException {
+			boolean finEnchere = prochainProduit==null;
+			String msg = "";
+			fenetreEnchere.disalbeEncherir();
+			fenetreEnchere.getChrono().stopTimer();
+			if (winner != null) {
+				msg = "<html><b>VENTE TERMINEE, PRIX=" + prix + " GAGNANT: " + winner.getNom() +"</b><br/><br/>";
+			}else{
+				msg = "<html><b>VENTE TERMINEE, AUCUN GAGNANT!</b><br/><br/>";
+			}
+			if(!finEnchere){
+				msg+="<p>PRODUIT SUIVANT: "+ prochainProduit.getNom() +" - "+ prochainProduit.getDescription()+"!</p></html>";
+			}else{
+				msg+="ENCHERE TERMINEE! BYE BYE!! </html>";
+			}
+			fenetreEnchere.setMessageVente(msg, finEnchere);
 	}
 
 	public void initClient() {
