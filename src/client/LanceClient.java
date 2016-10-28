@@ -73,17 +73,17 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 	}
 
 	@Override
-	public void updatePrice(double prix, Acheteur winner) throws RemoteException {
+	public void modifierPrix(double prix, Acheteur dernierEnchireur) throws RemoteException {
 		if (PRODUITENVENTE == null) {
-			PRODUITENVENTE = new Produit("prod", prix, "Desc");
+			System.out.println("erreur aucun produit en vente !");
 		}
 		PRODUITENVENTE.setPrix(prix);
-		PRODUITENVENTE.setWinner(winner);
+		PRODUITENVENTE.setDernierEnchireur(dernierEnchireur);
 		System.out.println("client: Nouveau prix ==> " + prix);
 		fenetreEnchere.getPrixEnchere().setText("Gagnant: " + LanceClient.PRODUITENVENTE.getWinner().getId() + "  Prix:"
 				+ LanceClient.PRODUITENVENTE.getPrix());
 		// On reinitialise le chronometre du client qui vient d'encherir
-		if(ACHETEUR.getId().equals(winner.getId())) fenetreEnchere.setCountChrono(0);
+		if(ACHETEUR.getId().equals(dernierEnchireur.getId())) fenetreEnchere.setCountChrono(0);
 	}
 
 	@Override

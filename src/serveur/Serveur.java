@@ -6,9 +6,7 @@ import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import client.Acheteur;
@@ -82,7 +80,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 				if(produitEnVente.getWinner()!=null && produitEnVente.getWinner().getEtat()!=EtatAcheteur.TERMINE) produitEnVente.getWinner().setEtat(EtatAcheteur.EN_ATTENTE);
 				acheteur.setEtat(EtatAcheteur.ENCHERISSEMENT);
 				produitEnVente.setPrix(prix);
-				produitEnVente.setWinner(acheteur);
+				produitEnVente.setDernierEnchireur(acheteur);
 				updateBidders(prix, acheteur);
 			}
 		} else {
@@ -97,7 +95,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 		for (Acheteur acheteur : listeAcheteurs.values()) {
 			try {
 				client = connecterAuClient(acheteur);
-				client.updatePrice(prix, winner);
+				client.modifierPrix(prix, winner);
 			} catch (ClientConnexionFailException | RemoteException e) {
 				System.out.println("Impossible de joindre l'acheteur: " + acheteur.getNom() + " :" + e.getMessage());
 			}
@@ -124,7 +122,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 		for (Acheteur acheteur : listeAcheteurs.values()) {
 			try {
 				client = connecterAuClient(acheteur);
-				client.venteTerminee(produitEnVente.getPrix(), produitEnVente.getWinner(), prochainProduit);
+				client.venteTerminee(produitEnVente.getPrix(), produitEnVente.getDernierEnchireur(), prochainProduit);
 			} catch (RemoteException | ClientConnexionFailException e) {
 				System.out.println("Impossible de joindre l'acheteur: " + acheteur.getNom() + " :" + e.getMessage());
 			}
@@ -229,11 +227,6 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 		produits.add(new Produit("Telephone", 500, "ecran 5 pouces, 16go"));
 		produits.add(new Produit("Ordinateur Portable", 150, "DELL 15pources, 4go, 1To"));
 		produits.add(new Produit("Samsung S6", 500, "ecran 5.5 pouces, 3go"));
-	}
-
-	@Override
-	public Produit getProduitEnVente() {
-		return produitEnVente;
 	}
 
 	private synchronized void setProduitEnVente(Produit produit) {
