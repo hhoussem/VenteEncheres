@@ -49,9 +49,9 @@ public class Acheteur implements Serializable {
 		this.prenom = prenom;
 	}
 
-	public void updatePrice(double prix, Acheteur winner) {
+	public void updatePrice(double prix, Acheteur dernierEnchireur) {
 		produitEnVente.setPrix(prix);
-		produitEnVente.setWinner(winner);
+		produitEnVente.setDernierEnchireur(dernierEnchireur);
 	}
 
 	public String getUrl() {

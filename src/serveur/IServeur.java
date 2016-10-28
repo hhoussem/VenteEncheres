@@ -9,8 +9,6 @@ public interface IServeur extends Remote {
 	
 	public Produit demanderInscription(Acheteur acheteur) throws RemoteException;
 
-	public Produit getProduitEnVente() throws RemoteException;
-
 	public boolean encherir(String idAcheteur, Produit produit, double prix) throws RemoteException;
 
 	public void tempsEcoule(String idAcheteur) throws RemoteException;

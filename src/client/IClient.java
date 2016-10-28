@@ -15,9 +15,9 @@ public interface IClient extends Remote {
 	 */
 	void notifierNouvelleVente(Produit produit) throws RemoteException;
 
-	public void updatePrice(double prix, Acheteur winner) throws RemoteException;
+	public void modifierPrix(double prix, Acheteur dernierEnchireur) throws RemoteException;
 
-	public void venteTerminee(double prix, Acheteur winner) throws RemoteException;
+	public void venteTerminee(double prix, Acheteur dernierEnchireur) throws RemoteException;
 
 
 }

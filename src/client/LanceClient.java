@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.nio.channels.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
@@ -67,23 +66,23 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 	}
 
 	@Override
-	public void updatePrice(double prix, Acheteur winner) throws RemoteException {
+	public void modifierPrix(double prix, Acheteur dernierEnchireur) throws RemoteException {
 		if (PRODUITENVENTE == null) {
-			PRODUITENVENTE = new Produit("prod", prix, "Desc");
+			System.out.println("erreur aucun produit en vente !");
 		}
 		PRODUITENVENTE.setPrix(prix);
-		PRODUITENVENTE.setWinner(winner);
+		PRODUITENVENTE.setDernierEnchireur(dernierEnchireur);
 		System.out.println("client: Nouveau prix ==> " + prix);
-		fenetreEnchere.getPrixEnchere().setText("Gagnant: " + LanceClient.PRODUITENVENTE.getWinner().getId() + "  Prix:"
+		fenetreEnchere.getPrixEnchere().setText("Gagnant: " + LanceClient.PRODUITENVENTE.getDernierEnchireur().getId() + "  Prix:"
 				+ LanceClient.PRODUITENVENTE.getPrix());
 		// A determiner quand on re-initialise le chronometre
-		if(ACHETEUR.getId().equals(winner.getId())) fenetreEnchere.setCountChrono(0);
+		if(ACHETEUR.getId().equals(dernierEnchireur.getId())) fenetreEnchere.setCountChrono(0);
 	}
 
 	@Override
-	public synchronized void venteTerminee(double prix, Acheteur winner) throws RemoteException {
-		if (winner != null) {
-			String msg = "VENTE TERMINEE, PRIX=" + prix + " GAGNANT: " + winner.getNom();
+	public synchronized void venteTerminee(double prix, Acheteur dernierEnchireur) throws RemoteException {
+		if (dernierEnchireur != null) {
+			String msg = "VENTE TERMINEE, PRIX=" + prix + " GAGNANT: " + dernierEnchireur.getNom();
 			System.out.println(msg);
 			fenetreEnchere.getPrixEnchere().setText(msg);
 		}
