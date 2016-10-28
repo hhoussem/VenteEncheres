@@ -43,18 +43,29 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 		}
 	}
 
+	private void validerLesRetardataires(){
+		for(Acheteur ach: listeTemporaire){
+			if(!listeAcheteurs.containsKey(ach.getId())){
+				listeAcheteurs.put(ach.getId(), ach);
+			}
+		}
+	}
+	
 	@Override
 	public synchronized Produit demanderInscription(Acheteur _acheteur) throws RemoteException {
 
 		Acheteur acheteur = new Acheteur(_acheteur.getId(), _acheteur.getNom(), _acheteur.getPrenom());
 		acheteur.setUrl(_acheteur.getUrl());
 		System.out.println("Inscription de l'acheteur => " + acheteur.toString());
+		listeTemporaire.add(acheteur);
 		try {
-			if (listeAcheteurs.size() < NOMBRE_MAX_CLIENT) {
-				listeAcheteurs.put(acheteur.getId(), acheteur);
+			if ((listeTemporaire.size() >= NOMBRE_MAX_CLIENT) && ETAT_VENTE_VALIDEE) {
+				validerLesRetardataires();
 				notify();
+				return produitEnVente;
+			}else{
+				return null;
 			}
-			return produitEnVente;
 		} catch (Exception e) {
 			return null;
 		}
@@ -187,7 +198,8 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 				e.printStackTrace();
 			}
 		}
-
+		
+		validerLesRetardataires();
 		System.out.println("Mise au enchere du produit : " + produits.get(indexVenteEncours));
 		ETAT_VENTE_VALIDEE = false;
 		setProduitEnVente(produit);

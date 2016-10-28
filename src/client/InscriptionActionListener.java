@@ -28,8 +28,7 @@ public class InscriptionActionListener implements ActionListener {
 			produit = remoteServeur.demanderInscription(acheteur);
 			if (produit != null) {
 				LanceClient.PRODUITENVENTE = produit;
-				// new FenetreInscriptionVente(this.remoteServeur, produit,
-				// acheteur);
+				// new FenetreInscriptionVente(this.remoteServeur, produit,// acheteur);
 			} else {
 				fenetreInscription.afficherMessageSurLaVente("Vente en attente!");
 			}
