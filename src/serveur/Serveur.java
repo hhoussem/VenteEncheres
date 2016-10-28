@@ -19,7 +19,8 @@ import commun.exception.ClientConnexionFailException;
 
 public class Serveur extends UnicastRemoteObject implements IServeur {
 
-	static private Map<String, Acheteur> listeAcheteurs = new HashMap<String, Acheteur>();
+	private Map<String, Acheteur> listeAcheteurs = new HashMap<String, Acheteur>();
+	private List<Acheteur> listeTemporaire = new ArrayList<Acheteur>();
 	private Produit produitEnVente = null;
 	private final int NOMBRE_MAX_CLIENT = 2;
 	private static boolean ETAT_VENTE_VALIDEE = true; // Vente en cours ou vente validée par les acheteurs
@@ -78,13 +79,14 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	synchronized public boolean encherir(String idAcheteur, Produit produit, double prix) throws RemoteException {
 		Acheteur acheteur = listeAcheteurs.get(idAcheteur);
 		if (acheteur != null) {
-			if (prix > produitEnVente.getPrix()) {
-				if(produitEnVente.getDernierEnchireur()!=null && produitEnVente.getDernierEnchireur().getEtat()!=EtatAcheteur.TERMINE) produitEnVente.getDernierEnchireur().setEtat(EtatAcheteur.EN_ATTENTE);
-				acheteur.setEtat(EtatAcheteur.ENCHERISSEMENT);
-				produitEnVente.setPrix(prix);
-				produitEnVente.setDernierEnchireur(acheteur);
-				updateBidders(prix, acheteur);
-			}
+			if (produitEnVente.getDernierEnchireur() != null
+					&& produitEnVente.getDernierEnchireur().getEtat() != EtatAcheteur.TERMINE)
+				produitEnVente.getDernierEnchireur().setEtat(EtatAcheteur.EN_ATTENTE);
+			acheteur.setEtat(EtatAcheteur.ENCHERISSEMENT);
+			produitEnVente.setPrixEnchere(prix);
+			produitEnVente.setDernierEnchireur(acheteur);
+			updateBidders(prix, acheteur);
+
 		} else {
 			System.out.println("Encherir: L'acheteur n'est pas encore inscrit!");
 			return false;
