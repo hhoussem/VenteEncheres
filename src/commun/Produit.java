@@ -40,8 +40,8 @@ public class Produit implements Serializable {
 		return prix;
 	}
 
-	public void setPrix(double prix) {
-		this.prix = prix;
+	public void setPrixEnchere(double prix) {
+		this.prix += prix;
 	}
 
 	public String getDescription() {

@@ -78,13 +78,14 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	synchronized public boolean encherir(String idAcheteur, Produit produit, double prix) throws RemoteException {
 		Acheteur acheteur = listeAcheteurs.get(idAcheteur);
 		if (acheteur != null) {
-			if (prix > produitEnVente.getPrix()) {
-				if(produitEnVente.getDernierEnchireur()!=null && produitEnVente.getDernierEnchireur().getEtat()!=EtatAcheteur.TERMINE) produitEnVente.getDernierEnchireur().setEtat(EtatAcheteur.EN_ATTENTE);
-				acheteur.setEtat(EtatAcheteur.ENCHERISSEMENT);
-				produitEnVente.setPrix(prix);
-				produitEnVente.setDernierEnchireur(acheteur);
-				updateBidders(prix, acheteur);
-			}
+			if (produitEnVente.getDernierEnchireur() != null
+					&& produitEnVente.getDernierEnchireur().getEtat() != EtatAcheteur.TERMINE)
+				produitEnVente.getDernierEnchireur().setEtat(EtatAcheteur.EN_ATTENTE);
+			acheteur.setEtat(EtatAcheteur.ENCHERISSEMENT);
+			produitEnVente.setPrixEnchere(prix);
+			produitEnVente.setDernierEnchireur(acheteur);
+			updateBidders(prix, acheteur);
+
 		} else {
 			System.out.println("Encherir: L'acheteur n'est pas encore inscrit!");
 			return false;
