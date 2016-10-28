@@ -77,7 +77,7 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 		if (PRODUITENVENTE == null) {
 			System.out.println("erreur aucun produit en vente !");
 		}
-		PRODUITENVENTE.setPrix(prix);
+		PRODUITENVENTE.setPrixEnchere(prix);
 		PRODUITENVENTE.setDernierEnchireur(dernierEnchireur);
 		System.out.println("client: Nouveau prix ==> " + prix);
 		fenetreEnchere.getPrixEnchere().setText("Gagnant: " + LanceClient.PRODUITENVENTE.getDernierEnchireur().getId() + "  Prix:"
