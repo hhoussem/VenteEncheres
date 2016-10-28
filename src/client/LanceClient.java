@@ -46,8 +46,7 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 
 	public void run() {
 		initClient();
-		// never used ? why
-		FenetreInscription fenetreInscription = new FenetreInscription(remoteServer);
+		fenetreInsciption = new FenetreInscription(remoteServer);
 	}
 
 	@Override
@@ -55,6 +54,9 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 		if (fenetreEnchere == null) {
 			fenetreEnchere = new FenetreEnchere("ENCHERE " + ACHETEUR.getId() + " - " + ACHETEUR.getNom(),
 					remoteServer);
+		}
+		if(fenetreInsciption!=null) {
+			fenetreInsciption.dispose();
 		}
 		PRODUITENVENTE = produit;
 		fenetreEnchere.setEncherMessage("Produit en cours de Vente :" + produit.getNom() + "/"
@@ -72,7 +74,7 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 		fenetreEnchere.getPrixEnchere().setText("Gagnant: " + LanceClient.PRODUITENVENTE.getWinner().getId() + "  Prix:"
 				+ LanceClient.PRODUITENVENTE.getPrix());
 		// A determiner quand on re-initialise le chronometre
-		fenetreEnchere.setCountChrono(0);
+		if(ACHETEUR.getId().equals(winner.getId())) fenetreEnchere.setCountChrono(0);
 	}
 
 	@Override
