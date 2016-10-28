@@ -6,7 +6,9 @@ import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import client.Acheteur;
@@ -77,7 +79,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 		Acheteur acheteur = listeAcheteurs.get(idAcheteur);
 		if (acheteur != null) {
 			if (prix > produitEnVente.getPrix()) {
-				if(produitEnVente.getWinner()!=null && produitEnVente.getWinner().getEtat()!=EtatAcheteur.TERMINE) produitEnVente.getWinner().setEtat(EtatAcheteur.EN_ATTENTE);
+				if(produitEnVente.getDernierEnchireur()!=null && produitEnVente.getDernierEnchireur().getEtat()!=EtatAcheteur.TERMINE) produitEnVente.getDernierEnchireur().setEtat(EtatAcheteur.EN_ATTENTE);
 				acheteur.setEtat(EtatAcheteur.ENCHERISSEMENT);
 				produitEnVente.setPrix(prix);
 				produitEnVente.setDernierEnchireur(acheteur);

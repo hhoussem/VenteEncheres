@@ -19,5 +19,4 @@ public interface IClient extends Remote {
 
 	public void venteTerminee(double prix, Acheteur dernierEnchireur, Produit prochainProduit) throws RemoteException;
 
-
 }

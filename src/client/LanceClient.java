@@ -80,20 +80,20 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 		PRODUITENVENTE.setPrix(prix);
 		PRODUITENVENTE.setDernierEnchireur(dernierEnchireur);
 		System.out.println("client: Nouveau prix ==> " + prix);
-		fenetreEnchere.getPrixEnchere().setText("Gagnant: " + LanceClient.PRODUITENVENTE.getWinner().getId() + "  Prix:"
+		fenetreEnchere.getPrixEnchere().setText("Gagnant: " + LanceClient.PRODUITENVENTE.getDernierEnchireur().getId() + "  Prix:"
 				+ LanceClient.PRODUITENVENTE.getPrix());
 		// On reinitialise le chronometre du client qui vient d'encherir
 		if(ACHETEUR.getId().equals(dernierEnchireur.getId())) fenetreEnchere.setCountChrono(0);
 	}
 
 	@Override
-	public synchronized void venteTerminee(double prix, Acheteur winner, Produit prochainProduit) throws RemoteException {
+	public synchronized void venteTerminee(double prix, Acheteur dernierEnchireur, Produit prochainProduit) throws RemoteException {
 			boolean finEnchere = prochainProduit==null;
 			String msg = "";
 			fenetreEnchere.disalbeEncherir();
 			fenetreEnchere.getChrono().stopTimer();
-			if (winner != null) {
-				msg = "<html><b>VENTE TERMINEE, PRIX=" + prix + " GAGNANT: " + winner.getNom() +"</b><br/><br/>";
+			if (dernierEnchireur != null) {
+				msg = "<html><b>VENTE TERMINEE, PRIX=" + prix + " GAGNANT: " + dernierEnchireur.getNom() +"</b><br/><br/>";
 			}else{
 				msg = "<html><b>VENTE TERMINEE, AUCUN GAGNANT!</b><br/><br/>";
 			}
