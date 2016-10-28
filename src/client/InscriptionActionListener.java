@@ -10,34 +10,36 @@ import javax.swing.JOptionPane;
 import commun.Produit;
 import serveur.IServeur;
 
-public class InscriptionActionListener implements ActionListener{
+public class InscriptionActionListener implements ActionListener {
+
 	FenetreInscription fenetreInscription;
 	IServeur remoteServeur;
-	
-	public InscriptionActionListener(FenetreInscription window,Remote r) {
+
+	public InscriptionActionListener(FenetreInscription window, Remote r) {
 		this.fenetreInscription = window;
 		this.remoteServeur = (IServeur) r;
 	}
-	
+
 	private void enregistrerAcheteur(Acheteur acheteur) {
 		System.out.println("Lancement de l'acheteur");
 		Produit produit = null;
 		try {
 			LanceClient.ACHETEUR = acheteur;
 			produit = remoteServeur.demanderInscription(acheteur);
-			if(produit != null){
+			if (produit != null) {
 				LanceClient.PRODUITENVENTE = produit;
-				//new FenetreInscriptionVente(this.remoteServeur, produit, acheteur);
-			}else{
+				// new FenetreInscriptionVente(this.remoteServeur, produit,
+				// acheteur);
+			} else {
 				fenetreInscription.afficherMessageSurLaVente("Vente en attente!");
 			}
-			
+
 		} catch (RemoteException e) {
 
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	synchronized public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(fenetreInscription.buttonEnregistrer)) {
@@ -58,5 +60,3 @@ public class InscriptionActionListener implements ActionListener{
 	}
 
 }
-
-

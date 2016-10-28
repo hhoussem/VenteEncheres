@@ -3,7 +3,6 @@ package commun;
 import java.io.Serializable;
 
 import client.Acheteur;
-import client.Acheteur;
 
 public class Produit implements Serializable {
 

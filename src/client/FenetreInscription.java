@@ -11,10 +11,9 @@ import javax.swing.JTextField;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager;
 
-import com.seaglasslookandfeel.*;
-
 public class FenetreInscription extends JFrame {
 
+	private static final long serialVersionUID = 1L;
 	JTextField textID;
 	JTextField textNom;
 	JTextField textPrenom;
@@ -26,9 +25,9 @@ public class FenetreInscription extends JFrame {
 
 	public FenetreInscription(Remote r) {
 		initComponents();
-		this.buttonEnregistrer.addActionListener(new InscriptionActionListener(this,r));
-		this.buttonAnnuler.addActionListener(new InscriptionActionListener(this,r));
-		
+		this.buttonEnregistrer.addActionListener(new InscriptionActionListener(this, r));
+		this.buttonAnnuler.addActionListener(new InscriptionActionListener(this, r));
+
 	}
 
 	private void initComponents() {
@@ -70,23 +69,23 @@ public class FenetreInscription extends JFrame {
 		this.messageSurLaVente = new JLabel();
 		messageSurLaVente.setVisible(false);
 		container.add(containerForm);
-		container.add(messageSurLaVente);		
-		//this.pack();
+		container.add(messageSurLaVente);
+		// this.pack();
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
-		
-		if(LanceClient.ACHETEUR!=null){
+
+		if (LanceClient.ACHETEUR != null) {
 			textID.setText(LanceClient.ACHETEUR.getId());
 			textID.setEnabled(false);
 		}
 
 	}
-	
-	public void afficherMessageSurLaVente(String message){
+
+	public void afficherMessageSurLaVente(String message) {
 		System.out.println("ICIIIIIII");
 		containerForm.setVisible(false);
 		messageSurLaVente.setText(message);
-		messageSurLaVente.setVisible(true);		
+		messageSurLaVente.setVisible(true);
 	}
 
 }
