@@ -53,7 +53,7 @@ public class Acheteur implements Serializable {
 
 	public void updatePrice(double prix, Acheteur dernierEnchireur) {
 		produitEnVente.setPrix(prix);
-		produitEnVente.setWinner(dernierEnchireur);
+		produitEnVente.setDernierEnchireur(dernierEnchireur);
 	}
 
 	public String getUrl() {
