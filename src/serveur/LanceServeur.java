@@ -9,7 +9,7 @@ import commun.Parametres;
 public class LanceServeur {
 
 	public static void main(String[] args) {
-		
+
 		try {
 			LocateRegistry.createRegistry(Parametres.PORT_SERVEUR);
 			IServeur iserveur = new Serveur();
@@ -22,7 +22,7 @@ public class LanceServeur {
 			int i = 0;
 			while (i < serveur.getProduits().size()) {
 				serveur.mettreAuxEcheres(serveur.getProduits().get(i));
-				serveur.setIndexVenteEncours(i);			
+				serveur.setIndexVenteEncours(i);
 				i++;
 			}
 		} catch (RemoteException e) {
