@@ -1,4 +1,4 @@
-package client;
+package client.actionListeners;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -7,6 +7,9 @@ import java.rmi.RemoteException;
 
 import javax.swing.JOptionPane;
 
+import client.Acheteur;
+import client.LanceClient;
+import client.ui.FenetreInscription;
 import commun.Produit;
 import serveur.IServeur;
 
@@ -28,7 +31,8 @@ public class InscriptionActionListener implements ActionListener {
 			produit = remoteServeur.demanderInscription(acheteur);
 			if (produit != null) {
 				LanceClient.PRODUITENVENTE = produit;
-				// new FenetreInscriptionVente(this.remoteServeur, produit,// acheteur);
+				// new FenetreInscriptionVente(this.remoteServeur, produit,//
+				// acheteur);
 			} else {
 				fenetreInscription.afficherMessageSurLaVente("Vente en attente!");
 			}

@@ -10,7 +10,7 @@ public class Produit implements Serializable {
 	private String nom;
 	private double prix;
 	private String description;
-	private Acheteur dernierEnchireur;
+	private Acheteur dernierEncherisseur;
 
 	private static final long serialVersionUID = 1485L;
 
@@ -51,13 +51,13 @@ public class Produit implements Serializable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public Acheteur getDernierEnchireur() {
-		return dernierEnchireur;
+	public Acheteur getDernierEncherisseur() {
+		return dernierEncherisseur;
 	}
 
 
-	public void setDernierEnchireur(Acheteur dernierEnchireur) {
-		this.dernierEnchireur = dernierEnchireur;
+	public void setDernierEncherisseur(Acheteur dernierEncherisseur) {
+		this.dernierEncherisseur = dernierEncherisseur;
 	}
 	public String toString() {
 		return nom + " " + prix + " " + description;

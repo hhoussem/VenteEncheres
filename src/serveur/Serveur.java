@@ -118,12 +118,12 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	synchronized public boolean encherir(String idAcheteur, Produit produit, double prix) throws RemoteException {
 		Acheteur acheteur = listeAcheteurs.get(idAcheteur);
 		if (acheteur != null) {
-			if (produitEnVente.getDernierEnchireur() != null
-					&& produitEnVente.getDernierEnchireur().getEtat() != EtatAcheteur.TERMINE)
-				produitEnVente.getDernierEnchireur().setEtat(EtatAcheteur.EN_ATTENTE);
+			if (produitEnVente.getDernierEncherisseur() != null
+					&& produitEnVente.getDernierEncherisseur().getEtat() != EtatAcheteur.TERMINE)
+				produitEnVente.getDernierEncherisseur().setEtat(EtatAcheteur.EN_ATTENTE);
 			acheteur.setEtat(EtatAcheteur.ENCHERISSEMENT);
 			produitEnVente.setPrixEnchere(prix);
-			produitEnVente.setDernierEnchireur(acheteur);
+			produitEnVente.setDernierEncherisseur(acheteur);
 			mettreAjourAcheteurs(prix, acheteur);
 
 		} else {
@@ -135,17 +135,17 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 
 	/**
 	 * methode appelée quand un acheteur enchérit, elle diffuse le nouveau prix,
-	 * et le dernier enchireur pour tous les acheteurs
+	 * et le dernier Encherisseur pour tous les acheteurs
 	 * 
 	 * @param prix
-	 * @param dernierEnchireur
+	 * @param dernierencherisseur
 	 */
-	private void mettreAjourAcheteurs(double prix, Acheteur dernierEnchireur) {
+	private void mettreAjourAcheteurs(double prix, Acheteur dernierEncherisseur) {
 		IClient client;
 		for (Acheteur acheteur : listeAcheteurs.values()) {
 			try {
 				client = connecterAuClient(acheteur);
-				client.modifierPrix(prix, dernierEnchireur);
+				client.modifierPrix(prix, dernierEncherisseur);
 			} catch (ClientConnexionFailException | RemoteException e) {
 				System.out.println("Impossible de joindre l'acheteur: " + acheteur.getNom() + " :" + e.getMessage());
 			}
@@ -179,7 +179,7 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 		for (Acheteur acheteur : listeAcheteurs.values()) {
 			try {
 				client = connecterAuClient(acheteur);
-				client.venteTerminee(produitEnVente.getPrix(), produitEnVente.getDernierEnchireur(), prochainProduit);
+				client.venteTerminee(produitEnVente.getPrix(), produitEnVente.getDernierEncherisseur(), prochainProduit);
 			} catch (RemoteException | ClientConnexionFailException e) {
 				System.out.println("Impossible de joindre l'acheteur: " + acheteur.getNom() + " :" + e.getMessage());
 			}

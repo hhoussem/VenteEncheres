@@ -1,4 +1,4 @@
-package client;
+package client.ui;
 
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -9,16 +9,20 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.UnsupportedLookAndFeelException;
+
+import client.LanceClient;
+import client.actionListeners.InscriptionActionListener;
+
 import javax.swing.UIManager;
 
 public class FenetreInscription extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	JTextField textID;
-	JTextField textNom;
-	JTextField textPrenom;
-	JButton buttonEnregistrer;
-	JButton buttonAnnuler;
+	public JTextField textID;
+	public JTextField textNom;
+	public JTextField textPrenom;
+	public JButton buttonEnregistrer;
+	public JButton buttonAnnuler;
 	JLabel messageSurLaVente;
 	Container container;
 	Container containerForm;
@@ -82,7 +86,7 @@ public class FenetreInscription extends JFrame {
 	}
 
 	public void afficherMessageSurLaVente(String message) {
-		System.out.println("message :"+message);
+		System.out.println("message :" + message);
 		containerForm.setVisible(false);
 		messageSurLaVente.setText(message);
 		messageSurLaVente.setVisible(true);

@@ -1,4 +1,4 @@
-package client;
+package client.ui;
 
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -13,6 +13,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import client.LanceClient;
+import client.actionListeners.EncherirActionListener;
+import client.actionListeners.ValiderActionListener;
 import commun.Chronometre;
 import commun.EtatAcheteur;
 import commun.Parametres;
@@ -22,7 +25,7 @@ public class FenetreEnchere extends JFrame implements ActionListener {
 
 	JButton encherirBtn;
 	JButton validerBtn;
-	JTextField prixInput;
+	public JTextField prixInput;
 	JLabel prixEnchere;
 	JLabel chronoAffichage;
 
@@ -96,17 +99,21 @@ public class FenetreEnchere extends JFrame implements ActionListener {
 			}
 		}
 	}
-	
+
 	/**
-	 * Afficher le message quand une vente est terminée et que l'acheteur doit passer à la prochaine vent
-	 * @param msg: message à afficher
-	 * @param finEchere: vrai si c'est la derniere vent (fin de l'enchere) 
+	 * Afficher le message quand une vente est terminée et que l'acheteur doit
+	 * passer à la prochaine vent
+	 * 
+	 * @param msg:
+	 *            message à afficher
+	 * @param finEchere:
+	 *            vrai si c'est la derniere vent (fin de l'enchere)
 	 */
-	public void setMessageVente(String msg, boolean finEnchere){
+	public void setMessageVente(String msg, boolean finEnchere) {
 		prixEnchere.setText(msg);
-		if(!finEnchere){
+		if (!finEnchere) {
 			validerBtn.setVisible(true);
-		}else{
+		} else {
 			validerBtn.setVisible(false);
 		}
 	}

@@ -1,12 +1,15 @@
-package client;
+package client.actionListeners;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+
+import client.LanceClient;
+import client.ui.FenetreEnchere;
 import serveur.IServeur;
 
-class ValiderActionListener implements ActionListener {
+public class ValiderActionListener implements ActionListener {
 	FenetreEnchere fenEnchere;
 	IServeur remote;
 

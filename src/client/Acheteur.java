@@ -15,8 +15,9 @@ public class Acheteur implements Serializable {
 	private String url;
 	private int port;
 	private EtatAcheteur etat = EtatAcheteur.EN_ATTENTE;
-	
-	private boolean aValiderLaVente = false;
+
+	private boolean aValiderLaVente = false; // true si l'acheteur a cliqué sur
+												// valider la vente
 
 	private static final long serialVersionUID = 1L;
 
@@ -51,9 +52,9 @@ public class Acheteur implements Serializable {
 		this.prenom = prenom;
 	}
 
-	public void updatePrice(double prix, Acheteur dernierEnchireur) {
+	public void updatePrice(double prix, Acheteur dernierEncherisseur) {
 		produitEnVente.setPrixEnchere(prix);
-		produitEnVente.setDernierEnchireur(dernierEnchireur);
+		produitEnVente.setDernierEncherisseur(dernierEncherisseur);
 	}
 
 	public String getUrl() {
@@ -92,7 +93,8 @@ public class Acheteur implements Serializable {
 	}
 
 	/**
-	 * @param aValiderLaVente the aValiderLaVente to set
+	 * @param aValiderLaVente
+	 *            the aValiderLaVente to set
 	 */
 	public void setaValiderLaVente(boolean aValiderLaVente) {
 		this.aValiderLaVente = aValiderLaVente;

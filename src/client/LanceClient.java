@@ -9,6 +9,9 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
+
+import client.ui.FenetreEnchere;
+import client.ui.FenetreInscription;
 import commun.Parametres;
 import commun.Produit;
 import serveur.IServeur;
@@ -30,19 +33,10 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 	}
 
 	public static void main(String[] args) {
-		/*
-		 FenetreEnchere fenetreEnchere = new FenetreEnchere("TEST", null);
-		 String msg = "<html><b>VENTE TERMINEE, PRIX=" + "750" + " GAGNANT: " + "Toto be caotpa</b><br/><br/>";
-		 msg+="<p>PRODUIT SUIVANT: PIZZA 500g 4 fromages!</p></html>";
-		fenetreEnchere.setMessageVente(msg, true);
-		//fenetreEnchere.getVenteSuivante().setText("PRODUIT SUIVANT: PIZZA 500g 4 fromages!");
-		 if(true) return;*/
-
 		try {
 			LanceClient client = new LanceClient();
 			client.run();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -55,13 +49,13 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 	@Override
 	public void notifierNouvelleVente(Produit produit) throws RemoteException {
 		if (fenetreEnchere == null) {
-			if(fenetreInsciption != null){
-			fenetreInsciption.dispose();
+			if (fenetreInsciption != null) {
+				fenetreInsciption.dispose();
 			}
 			fenetreEnchere = new FenetreEnchere("ENCHERE " + ACHETEUR.getId() + " - " + ACHETEUR.getNom(),
 					remoteServer);
 		}
-		if(fenetreInsciption!=null) {
+		if (fenetreInsciption != null) {
 			fenetreInsciption.dispose();
 		}
 		PRODUITENVENTE = produit;
@@ -73,41 +67,47 @@ public class LanceClient extends UnicastRemoteObject implements IClient, Seriali
 	}
 
 	@Override
-	public void modifierPrix(double prix, Acheteur dernierEnchireur) throws RemoteException {
+	public void modifierPrix(double prix, Acheteur dernierEncherisseur) throws RemoteException {
 		if (PRODUITENVENTE == null) {
 			System.out.println("erreur aucun produit en vente !");
 		}
 		PRODUITENVENTE.setPrixEnchere(prix);
-		PRODUITENVENTE.setDernierEnchireur(dernierEnchireur);
+		PRODUITENVENTE.setDernierEncherisseur(dernierEncherisseur);
 		System.out.println("client: Nouveau prix ==> " + prix);
-		fenetreEnchere.getPrixEnchere().setText("Gagnant: " + LanceClient.PRODUITENVENTE.getDernierEnchireur().getId() + "  Prix:"
-				+ LanceClient.PRODUITENVENTE.getPrix());
+		fenetreEnchere.getPrixEnchere()
+				.setText("Gagnant: " + LanceClient.PRODUITENVENTE.getDernierEncherisseur().getId() + "  Prix:"
+						+ LanceClient.PRODUITENVENTE.getPrix());
 		// On reinitialise le chronometre du client qui vient d'encherir
-		if(ACHETEUR.getId().equals(dernierEnchireur.getId())) fenetreEnchere.setCountChrono(0);
+		if (ACHETEUR.getId().equals(dernierEncherisseur.getId()))
+			fenetreEnchere.setCountChrono(0);
 	}
 
 	@Override
-	public synchronized void venteTerminee(double prix, Acheteur dernierEnchireur, Produit prochainProduit) throws RemoteException {
-			boolean finEnchere = prochainProduit==null;
-			String msg = "";
-			fenetreEnchere.disalbeEncherir();
-			fenetreEnchere.getChrono().stopTimer();
-			if (dernierEnchireur != null) {
-				msg = "<html><b>VENTE TERMINEE, PRIX=" + prix + " GAGNANT: " + dernierEnchireur.getNom() +"</b><br/><br/>";
-			}else{
-				msg = "<html><b>VENTE TERMINEE, AUCUN GAGNANT!</b><br/><br/>";
-			}
-			if(!finEnchere){
-				msg+="<p>PRODUIT SUIVANT: "+ prochainProduit.getNom() +" - "+ prochainProduit.getDescription()+"!</p></html>";
-			}else{
-				msg+="ENCHERE TERMINEE! BYE BYE!! </html>";
-			}
-			fenetreEnchere.setMessageVente(msg, finEnchere);
+	public synchronized void venteTerminee(double prix, Acheteur dernierEncherisseur, Produit prochainProduit)
+			throws RemoteException {
+		boolean finEnchere = prochainProduit == null;
+		String msg = "";
+		fenetreEnchere.disalbeEncherir();
+		fenetreEnchere.getChrono().stopTimer();
+		if (dernierEncherisseur != null) {
+			msg = "<html><b>VENTE TERMINEE, PRIX=" + prix + " GAGNANT: " + dernierEncherisseur.getNom()
+					+ "</b><br/><br/>";
+		} else {
+			msg = "<html><b>VENTE TERMINEE, AUCUN GAGNANT!</b><br/><br/>";
+		}
+		if (!finEnchere) {
+			msg += "<p>PRODUIT SUIVANT: " + prochainProduit.getNom() + " - " + prochainProduit.getDescription()
+					+ "!</p></html>";
+		} else {
+			msg += "ENCHERE TERMINEE! BYE BYE!! </html>";
+		}
+		fenetreEnchere.setMessageVente(msg, finEnchere);
 	}
 
 	public void initClient() {
 		try {
-			// Initialisatoin du client
+			// Initialisatoin du client , selection d'un port 
+			//aléatoire entre 10000 et 60000
 			Random rand = new Random();
 			int port = rand.nextInt(60000 - 10000) + 10000;
 			LocateRegistry.createRegistry(port);
