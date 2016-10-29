@@ -136,17 +136,25 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	/**
 	 * methode appelée quand un acheteur enchérit, elle diffuse le nouveau prix,
 	 * et le dernier enchireur pour tous les acheteurs
+	 * 
+	 * @param prix
+	 * @param dernierEnchireur
+	 */
+	private void mettreAjourAcheteurs(double prix, Acheteur dernierEnchireur) {
 		IClient client;
 		for (Acheteur acheteur : listeAcheteurs.values()) {
 			try {
 				client = connecterAuClient(acheteur);
-				client.modifierPrix(prix, winner);
+				client.modifierPrix(prix, dernierEnchireur);
 			} catch (ClientConnexionFailException | RemoteException e) {
 				System.out.println("Impossible de joindre l'acheteur: " + acheteur.getNom() + " :" + e.getMessage());
 			}
 		}
 	}
 
+	/**
+	 * methode qui verifie si la vente est terminée ou non
+	 */
 	private boolean verifierSiVenteTerminee() {
 		boolean terminee = true;
 		for (Acheteur acheteur : listeAcheteurs.values()) {
@@ -158,6 +166,9 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 		return terminee;
 	}
 
+	/**
+	 * appelée pour notifier tous les acheteurs quand la vente est terminée et
+	 * mettre en vente le produit suivant
 	 */
 	private synchronized void notifierVenteTerminee() {
 		IClient client;
@@ -176,6 +187,8 @@ public class Serveur extends UnicastRemoteObject implements IServeur {
 	}
 
 	/**
+	 * Quand une vente est terminée les clients doivent valider la vente en
+	 * appelant cette methode puis on passe à la vente suivante
 	 */
 	@Override
 	synchronized public void validerVente(String idAcheteur) throws RemoteException {
